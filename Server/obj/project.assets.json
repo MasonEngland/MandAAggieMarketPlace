@@ -4087,25 +4087,24 @@
     ]
   },
   "packageFolders": {
-    "/Users/mengland/.nuget/packages/": {}
+    "/home/alec/.nuget/packages/": {}
   },
   "project": {
     "version": "1.0.0",
     "restore": {
-      "projectUniqueName": "/Users/mengland/Projects/MandA Aggie Marketplace/Server/Server.csproj",
+      "projectUniqueName": "/home/alec/MandAAggieMarketPlace/Server/Server.csproj",
       "projectName": "Server",
-      "projectPath": "/Users/mengland/Projects/MandA Aggie Marketplace/Server/Server.csproj",
-      "packagesPath": "/Users/mengland/.nuget/packages/",
-      "outputPath": "/Users/mengland/Projects/MandA Aggie Marketplace/Server/obj/",
+      "projectPath": "/home/alec/MandAAggieMarketPlace/Server/Server.csproj",
+      "packagesPath": "/home/alec/.nuget/packages/",
+      "outputPath": "/home/alec/MandAAggieMarketPlace/Server/obj/",
       "projectStyle": "PackageReference",
       "configFilePaths": [
-        "/Users/mengland/.nuget/NuGet/NuGet.Config"
+        "/home/alec/.nuget/NuGet/NuGet.Config"
       ],
       "originalTargetFrameworks": [
         "net7.0"
       ],
       "sources": {
-        "/usr/local/share/dotnet/sdk/7.0.313/Sdks/Microsoft.NET.Sdk.Web/library-packs": {},
         "https://api.nuget.org/v3/index.json": {}
       },
       "frameworks": {
@@ -4166,7 +4165,7 @@
             "privateAssets": "all"
           }
         },
-        "runtimeIdentifierGraphPath": "/usr/local/share/dotnet/sdk/7.0.313/RuntimeIdentifierGraph.json"
+        "runtimeIdentifierGraphPath": "/usr/lib/dotnet/sdk/7.0.116/RuntimeIdentifierGraph.json"
       }
     }
   }

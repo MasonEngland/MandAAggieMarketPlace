@@ -87,3 +87,4 @@
 /Users/mengland/Projects/MandA Aggie Marketplace/Server/bin/Debug/net7.0/Microsoft.Extensions.DependencyModel.dll
 /Users/mengland/Projects/MandA Aggie Marketplace/Server/bin/Debug/net7.0/Mono.TextTemplating.dll
 /Users/mengland/Projects/MandA Aggie Marketplace/Server/bin/Debug/net7.0/System.CodeDom.dll
+/Users/mengland/Projects/MandA Aggie Marketplace/Server/bin/Debug/net7.0/BCrypt.Net-Next.dll

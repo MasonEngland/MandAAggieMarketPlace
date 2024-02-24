@@ -1,6 +1,7 @@
 using Microsoft.AspNetCore.Mvc;
 using Server.Context;
 using Server.Models;
+using static BCrypt.Net.BCrypt;
 
 namespace Server.Controllers;
 
@@ -25,14 +26,21 @@ public class AuthController : Controller
         try 
         {
              Account[] takenmail = _db.accounts
-            .Where(item => item.Email == account.Email).ToArray();
+                .Where(item => item.Email == account.Email).ToArray();
 
             if (takenmail.Length >= 1) 
             {
                 return BadRequest("Email already taken");
             }
 
-            _db.accounts.Add(account);
+            _db.accounts.Add(new Account() {
+                FirstName = account.FirstName,
+                LastName = account.LastName,
+                Email = account.Email,
+                Password = HashPassword(account.Password),
+                Balace = 0.0f
+                
+            });
             _db.SaveChanges();
 
             return StatusCode(201);

@@ -1,11 +1,12 @@
 {
   "version": 2,
-  "dgSpecHash": "PDhu4C24WqHdzjKPaQA0aZM8Qnkxe83B8KHTjnL6S0UmGu/SYb0ResCNqlNBQ9D0Mtibe2teuZiWtXMrvESUnQ==",
+  "dgSpecHash": "/378KL3G2PXrbJ+nxIVdSIWRZ3dE+6vL19Sf0iMCQdgSg6IbYPnnEXbDUtH1u/fyPzoK/DyF0ZpWkLJVEdgBWA==",
   "success": true,
   "projectFilePath": "/Users/mengland/Projects/MandA Aggie Marketplace/Server/Server.csproj",
   "expectedPackageFiles": [
     "/Users/mengland/.nuget/packages/azure.core/1.25.0/azure.core.1.25.0.nupkg.sha512",
     "/Users/mengland/.nuget/packages/azure.identity/1.7.0/azure.identity.1.7.0.nupkg.sha512",
+    "/Users/mengland/.nuget/packages/bcrypt.net-next/4.0.3/bcrypt.net-next.4.0.3.nupkg.sha512",
     "/Users/mengland/.nuget/packages/google.protobuf/3.21.9/google.protobuf.3.21.9.nupkg.sha512",
     "/Users/mengland/.nuget/packages/humanizer.core/2.14.1/humanizer.core.2.14.1.nupkg.sha512",
     "/Users/mengland/.nuget/packages/k4os.compression.lz4/1.3.5/k4os.compression.lz4.1.3.5.nupkg.sha512",

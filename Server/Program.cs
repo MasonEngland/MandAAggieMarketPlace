@@ -1,5 +1,6 @@
 using Server.Context;
 using Microsoft.EntityFrameworkCore;
+using Server.Middleware;
 
 namespace Server;
 
@@ -7,6 +8,7 @@ public class Program
 {
     public static void Main(string[] args) 
     {
+        DotEnv.Config("./.env");
         var builder = WebApplication.CreateBuilder(args);
 
         // Add services to the container.

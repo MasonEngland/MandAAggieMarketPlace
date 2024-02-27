@@ -98,7 +98,7 @@ public class AuthController : Controller
             };
         } catch (Exception err)
         {
-            System.Console.WriteLine(err.Message);
+            Console.WriteLine(err.Message);
             return StatusCode(500);
         }
     }

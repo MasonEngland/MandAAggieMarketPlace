@@ -1,5 +1,3 @@
-using System.Diagnostics;
-
 namespace Server.Middleware;
 
 public static class DotEnv
@@ -18,8 +16,7 @@ public static class DotEnv
 				StringSplitOptions
 					.RemoveEmptyEntries);
 
-			Debug.WriteLine(parts[1]);
-			if (parts.Length != 2) { continue;  }
+			if (parts.Length != 2) { throw new Exception("no environment var found");}
 
 			Environment.SetEnvironmentVariable(parts[0], parts[1]);
 

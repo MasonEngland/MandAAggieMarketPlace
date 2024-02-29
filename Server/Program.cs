@@ -14,6 +14,7 @@ public class Program
         // Add services to the container.
 
         builder.Services.AddControllers();
+        builder.Services.AddTransient<AuthToken>();
         // Learn more about configuring Swagger/OpenAPI at https://aka.ms/aspnetcore/swashbuckle
         
 
@@ -26,6 +27,8 @@ public class Program
         var app = builder.Build();
 
         app.UseAuthorization();
+
+        app.UseMiddleware<AuthToken>();
 
         app.MapControllers();
 

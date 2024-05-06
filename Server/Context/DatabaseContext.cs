@@ -6,8 +6,7 @@ namespace Server.Context;
 public class DatabaseContext : DbContext
 {
     public DbSet<Account> accounts {get; set;}
+    public DbSet<Item> CurrentStock { get; set; } 
 
-    public DatabaseContext(DbContextOptions<DatabaseContext> options) : base(options)
-    {
-    }
+    public DatabaseContext(DbContextOptions<DatabaseContext> options) : base(options) {}
 }

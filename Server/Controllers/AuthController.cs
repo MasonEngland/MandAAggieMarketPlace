@@ -85,6 +85,7 @@ public class AuthController : Controller
                 .AddClaim("Password", gotAccount[0].Password)
                 .AddClaim("FirstName", gotAccount[0].FirstName)
                 .AddClaim("LastName", gotAccount[0].LastName)
+                .AddClaim("Admin", false)
                 .Encode();
 
             return new 
@@ -101,12 +102,5 @@ public class AuthController : Controller
             Console.WriteLine(err.Message);
             return StatusCode(500);
         }
-    }
-
-    [HttpGet]
-    public string test()
-    {
-        return "it worked";
-    }
-
+    } 
 }

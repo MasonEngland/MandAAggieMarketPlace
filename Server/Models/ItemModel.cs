@@ -11,10 +11,13 @@ public class Item
 
     public Guid Id { get; set; }
 
+    public float Price { get; set; }
+
     public DateTime Date { get; set; }
 
     public Item() 
     {
+        Price = 0.0f;
         Date = DateTime.Now;
         Id = Guid.NewGuid();
     }

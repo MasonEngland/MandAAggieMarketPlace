@@ -12,7 +12,7 @@ public class Account
 
     public string Password {get; set;}
 
-    public double Balace {get; set;}
+    public float Balance { get; set; }
  
     public DateTime Date {get; set;} 
 

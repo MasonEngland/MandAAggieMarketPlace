@@ -40,7 +40,7 @@ public class AuthController : Controller
                 LastName = account.LastName,
                 Email = account.Email,
                 Password = HashPassword(account.Password),
-                Balace = 0.0f
+                Balance = 0.0f
                 
             });
             _db.SaveChanges();

@@ -17,8 +17,8 @@ public class CommerceController : Controller
         _db = db;
     }
 
-    [HttpPost("Purchase")]
-    public object purchase([FromBody] Item item)
+    [HttpPost("Purchase/{address}")]
+    public object purchase([FromBody] Item item, String address)    
     {
         string? data = Convert.ToString(HttpContext.Items["tokenData"]);
         if (data == null) 
@@ -28,13 +28,14 @@ public class CommerceController : Controller
 
         Account? account = JsonSerializer.Deserialize<Account>(data!);
 
-        if (account == null) 
+        if (account == null)    
         {
             return Unauthorized("token could not be deserialized");
         }
 
         try 
         {
+
             Item[] dbItem = _db.CurrentStock.Where(h => h.Id == item.Id).ToArray(); 
             if (dbItem.Length < 1) 
             {
@@ -50,11 +51,25 @@ public class CommerceController : Controller
 
 
             
-            //TODO : make a queue database
+            //TODO : make a queue database - DONE 
             //TODO : add purchased Item to the queue database
-            //TODO : return a reciet noting the tansaction details
+            
+            _db.OrderQueue.Add(new Order() {
+                OrderItem = dbItem[0],
+                Adress = address
+            });
 
-            return dbItem;
+
+            //TODO : return a reciet noting the tansaction details
+        
+
+            return new 
+            {
+                orderedItem = dbItem[0],
+                addressTo = address[0],
+                cost = $"-{dbItem[0].Price}",
+                success = true
+            };
         } catch (Exception err) 
         {
             System.Console.WriteLine(err.Message);

@@ -5,9 +5,7 @@ public class Item
 
     public string Name { get; set; }
 
-    public int Stock { get; set; }
-
-    public string? Buyer { get; set; }
+    public int Stock { get; set; } 
 
     public Guid Id { get; set; }
 
@@ -17,7 +15,6 @@ public class Item
 
     public Item() 
     {
-        Price = 0.0f;
         Date = DateTime.Now;
         Id = Guid.NewGuid();
     }

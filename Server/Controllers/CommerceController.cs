@@ -108,11 +108,11 @@ public class CommerceController : Controller
                 .Where(i => i.Id == item.Id || i.Name == item.Name)
                 .ToArray();
 
-            if (dbResults.Length > 1)
+            if (dbResults.Length >= 1)
             {
                 _db.CurrentStock
                 .Where(h => h.Id == item.Id || h.Name == item.Name)
-                .ExecuteUpdate(setter => setter.SetProperty(b => b.Stock, b => b.Stock + 1));
+                .ExecuteUpdate(setter => setter.SetProperty(b => b.Stock, b => b.Stock + item.Stock));
 
                 return new 
                 {

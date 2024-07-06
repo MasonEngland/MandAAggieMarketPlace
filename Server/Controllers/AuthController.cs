@@ -8,7 +8,7 @@ using JWT.Algorithms;
 namespace Server.Controllers;
 
 [ApiController]
-[Route("Auth")]
+[Route("Api/Auth")]
 public class AuthController : Controller
 {
     private readonly DatabaseContext _db;

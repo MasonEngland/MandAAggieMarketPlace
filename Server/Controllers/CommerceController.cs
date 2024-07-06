@@ -7,7 +7,7 @@ using Microsoft.EntityFrameworkCore;
 namespace Server.Controllers;
 
 [ApiController]
-[Route("Commerce")]
+[Route("Api/Commerce")]
 public class CommerceController : Controller
 {
     private readonly DatabaseContext _db;
@@ -35,6 +35,22 @@ public class CommerceController : Controller
     [HttpPost("Purchase/{address}")]
     public object purchase([FromBody] Item item, String address)    
     {
+        /*
+         *
+         * used when a logged in user purchases an items
+         * authorzation token is required through the auth header 
+         *
+         * @param address - String 
+         * the address will be added to the body of the orders that will get loaded from a separate front end
+         *
+         * @param item - Item instance
+         * will get sent through the request body and should include all the fields except for Date and Id 
+         * If an Id is provided then the method will search for an item with that Id, if not it will use the name as 
+         * the search parameters
+         *
+         *
+         */
+
         Account? account = GetAccount();
         if (account == null)    
         {
@@ -79,6 +95,7 @@ public class CommerceController : Controller
             
             _db.OrderQueue.Add(new Order() {
                 OrderItem = item,
+                OwnerId = Convert.ToString(account.Id)!, 
                 Adress = address
             });
             _db.SaveChanges();
@@ -104,6 +121,13 @@ public class CommerceController : Controller
     {
         try 
         {
+            /**
+             * check if the requested item exists 
+             * if the item exists then add 1 to the stock 
+             * if not, then add the item to the database
+             *
+             * adds as many items as the value of Item.stock in the request body 
+             */
             Item[] dbResults = _db.CurrentStock
                 .Where(i => i.Id == item.Id || i.Name == item.Name)
                 .ToArray();

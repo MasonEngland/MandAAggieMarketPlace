@@ -6,6 +6,8 @@ public class Order
 
     public Item OrderItem { get; set; }
 
+    public String OwnerId { get; set; }
+
     public String Adress { get; set; } 
     
     public DateTime Date { get; set; }

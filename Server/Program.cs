@@ -27,6 +27,7 @@ public class Program
         var app = builder.Build();
 
         app.UseAuthorization();
+        app.UseStaticFiles();
 
         app.UseMiddleware<AuthToken>();
 

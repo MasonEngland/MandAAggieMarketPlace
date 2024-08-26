@@ -32,8 +32,34 @@ public class CommerceController : Controller
         return account; 
     }
 
+    [HttpGet("GetStock")]
+    public object GetStock() 
+    {
+        /**
+         * this returns the entire stock of the store
+         * it's not planned for the store catalog 
+         * to grow too large so I see no problem with just
+         * grabbing all items at once, It is possible to make it return only the first few 
+         * and then return more later, but I will do that once it's neccessary 
+         * */
+        try 
+        {
+            Item[] stock = _db.CurrentStock.ToArray();
+            return new 
+            {
+                stock,
+                success = true
+            };
+        } catch (Exception err)
+        {
+            Console.WriteLine(err.Message);
+            return StatusCode(500);
+        }
+    }
+    
+
     [HttpPost("Purchase/{address}")]
-    public object purchase([FromBody] Item item, String address)    
+    public object Purchase([FromBody] Item item, String address)    
     {
         /*
          *

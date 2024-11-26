@@ -11,11 +11,13 @@ namespace Server.Controllers;
 public class CommerceController : Controller
 {
     private readonly DatabaseContext _db;
+
     public CommerceController(DatabaseContext db) 
     {
         _db = db;
     }
 
+    // Helper function for deserializing the account info from token data  
     private Account? GetAccount()
     {
         string? data = Convert.ToString(HttpContext.Items["tokendata"]);
@@ -32,19 +34,18 @@ public class CommerceController : Controller
         return account; 
     }
 
-    [HttpGet("GetStock")]
-    public object GetStock() 
+    [HttpGet("GetStock/{queries}")]
+    public object GetStock(int queries) 
     {
         /**
-         * this returns the entire stock of the store
-         * it's not planned for the store catalog 
-         * to grow too large so I see no problem with just
-         * grabbing all items at once, It is possible to make it return only the first few 
-         * and then return more later, but I will do that once it's neccessary 
+         * this will return all the store items up to the amount of queries requested
+         * if there are less than 10 items in the stock then it will return the full stock 
+         *  of the store
+         * 
          * */
         try 
         {
-            Item[] stock = _db.CurrentStock.ToArray();
+            List<Item> stock = _db.CurrentStock.Take(10 * queries).ToList<Item>();
             return new 
             {
                 stock,
@@ -109,10 +110,11 @@ public class CommerceController : Controller
                 };
             }
 
+            // lower the item stock by the amount requested
             _db.CurrentStock
                 .Where(h => h.Id == item.Id)
                 .ExecuteUpdate(setter => setter.SetProperty(b => b.Stock, b => b.Stock - item.Stock));
-         
+
             // remove the money from the clients account to pay for the product 
             _db.accounts
                 .Where(item => item.Id == account.Id)

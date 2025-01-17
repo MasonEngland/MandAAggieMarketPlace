@@ -15,8 +15,7 @@ public class Program
 
         builder.Services.AddControllers();
         builder.Services.AddTransient<AuthToken>();
-        // Learn more about configuring Swagger/OpenAPI at https://aka.ms/aspnetcore/swashbuckle
-        
+        // Learn more about configuring Swagger/OpenAPI at https://aka.ms/aspnetcore/swashbuckle 
 
         builder.Services.AddEndpointsApiExplorer(); 
         builder.Services.AddDbContext<DatabaseContext>(options => 
@@ -29,7 +28,7 @@ public class Program
         app.UseAuthorization();
         app.UseStaticFiles();
 
-        app.UseMiddleware<AuthToken>();
+        app.UseAuthToken();
 
         app.MapControllers();
 

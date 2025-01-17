@@ -15,6 +15,7 @@ public class AccountsController : Controller
         _db = db;
     }
 
+    // just a help function to deserialize token data
     private Account? GetAccount()
     {
         string? data = Convert.ToString(HttpContext.Items["tokendata"]);
@@ -31,7 +32,7 @@ public class AccountsController : Controller
         return account; 
     }
 
-
+    // Route: /Api/Accounts/Delete/id
     [HttpDelete("Delete/{id}")]
     public IActionResult DeleteAccount(String id) 
     {
@@ -49,6 +50,7 @@ public class AccountsController : Controller
         }
     }
 
+    // Route: /Api/Purchases/Balance/{funds}
     [HttpPut("Balance/{funds}")]
     public IActionResult AddFunds(double funds)
     {
@@ -70,4 +72,32 @@ public class AccountsController : Controller
         return Ok(new {success = true});
     }
 
+    //Route: /Api/Accounts/Purchases
+    [HttpGet("Purchases")]
+    public IActionResult GetPurchases() 
+    {
+        Account? account = GetAccount();
+        if (account == null) 
+        {
+            return Unauthorized(new {
+                success = false,
+                message = "Token could not be deserialized"
+            });
+        }
+
+        var Items = _db.OrderQueue.Where(b => b.OwnerId == Convert.ToString(account.Id)).ToArray();
+
+        if (Items.Length == 0) 
+        {
+            return Ok(new {
+                success = true,
+                messgae = "no items to be found"
+            });
+        }
+
+        return Ok(new {
+            success = true,
+            content = Items,
+        });
+    }
 }

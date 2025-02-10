@@ -50,7 +50,7 @@ public class AccountsController : Controller
         }
     }
 
-    // Route: /Api/Purchases/Balance/{funds}
+    // Route: /Api/Accounts/Balance/{funds}
     [HttpPut("Balance/{funds}")]
     public IActionResult AddFunds(double funds)
     {

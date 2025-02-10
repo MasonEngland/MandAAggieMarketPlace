@@ -20,7 +20,11 @@ public class AuthController : Controller
     [HttpPost("Create")]
     public object create([FromBody] Account account)
     {
-        if (account.Email == null) 
+        if (account.Email == null || 
+            account.Password == null || 
+            account.FirstName == null || 
+            account.LastName == null
+        ) 
         {
             return BadRequest("body of request is invalid");
         }

@@ -25,14 +25,20 @@ public class Program
 
         var app = builder.Build();
 
+        app.UseCors(builder => {
+            builder.AllowAnyOrigin();
+            builder.AllowAnyMethod();
+            builder.AllowAnyHeader();
+        });
         app.UseAuthorization();
+        
+
         app.UseStaticFiles();
 
         app.UseAuthToken();
 
         app.MapControllers();
 
-        app.UseCors();
 
         app.Run();
     }

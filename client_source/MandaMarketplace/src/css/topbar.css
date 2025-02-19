@@ -1,0 +1,109 @@
+header {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    padding: 20px;
+    background-color: #ffffff;
+    box-shadow: 0 2px 4px rgba(0, 0, 0, 0.1);
+    min-width: 1100px;
+}
+
+header > * {
+    background-color: inherit;
+}
+
+nav {
+    display: flex;
+    align-items: center;
+    margin-right: 100px;
+}
+
+span {
+    background-color: white;
+}
+
+.nav-item {
+    background-color: white;
+    margin-left: 10px;
+    margin-right: 10px;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    width: 80px;
+    height: 40px;
+    color: black;
+    background-color: none;
+    border-radius: 1px;
+}
+
+.selected {
+    background-color: #0E103D;
+    color: white;
+}
+
+img {
+    width: 100px;
+    height: 100px;
+}
+
+a {
+    text-decoration: none;
+}
+a:hover {
+    text-decoration: underline;
+    cursor: pointer;
+}
+
+b {
+    background-color: inherit;
+}
+
+button {
+    border: none;
+    width: 80px;
+    height: 40px;
+    background-color: #0E103D;
+}
+
+button > span {
+    background-color: inherit;
+    color: white;
+}
+
+button:hover {
+    cursor: pointer;
+}
+
+
+input {
+    border: none;
+    width: 200px;
+    height: 38px;
+    text-indent: 10px;
+    font-size: 14px;
+}
+
+
+
+@font-face {
+    font-family: 'Material Symbols Outlined';
+    font-style: normal;
+    font-weight: 400;
+    src: url(https://fonts.gstatic.com/icon/font?kit=kJF1BvYX7BgnkSrUwT8OhrdQw4oELdPIeeII9v6oDMzByHX9rA6RzaxHMPdY43zj-jCxv3fzvRNU22ZXGJpEpjC_1v-p_4MrImHCIJIZrDCvHOelbd5zrDAtg9Nr-tWP_MY&skey=b8dc2088854b122f&v=v226) format('woff');
+  }
+  
+  .material-symbols-outlined {
+    font-family: 'Material Symbols Outlined';
+    font-weight: normal;
+    font-style: normal;
+    font-size: 24px;
+    line-height: 1;
+    letter-spacing: normal;
+    text-transform: none;
+    display: inline-block;
+    white-space: nowrap;
+    word-wrap: normal;
+    direction: ltr;
+    text-rendering: optimizeLegibility;
+    -webkit-font-smoothing: antialiased;
+  }

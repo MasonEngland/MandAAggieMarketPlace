@@ -13,6 +13,8 @@ public class Item
 
     public DateTime Date { get; set; }
 
+    public string ImageLink { get; set; }
+
     public Item() 
     {
         Date = DateTime.Now;

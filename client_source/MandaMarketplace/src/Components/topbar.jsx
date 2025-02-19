@@ -1,24 +1,28 @@
 import React from 'react';
-import './topbar.css';
+import '../css/topbar.css';
 import USU_logo from '../assets/USU_logo.jpg';
 import Cookies from 'js-cookie';
 import axios from 'axios';
 import { useState } from 'react';
 import { useEffect } from 'react';
 
-export default function Topbar() {
+export default function Topbar(props) {
+    let selected = props.pageNumber;
+
+    // initialize account section to be login and register
     const [ accountSection, setAccountSection ] = useState(
         <nav>
-            <a href="/login" className="nav-item">
+            <a href="/login" className={"nav-item" + (selected == 3 ? "selcted" : "")}>
                 <b>Login</b>
             </a>
-            <a href="/register" className="nav-item">
+            <a href="/register" className={"nav-item" + (selected == 4 ? "selcted" : "")}>
                 <b>Register</b>
             </a>
         </nav>
     );
 
 
+    // check if user is logged in
     useEffect(() => {
         let token = Cookies.get('token');
         console.log(token);
@@ -28,7 +32,7 @@ export default function Topbar() {
                 let email = response.data.account.email
                 setAccountSection(
                     <nav>
-                        <a href="/account" className="nav-item"><b>{email}</b></a>
+                        <a href="/account" className={"nav-item" + (selected == 5 ? "selcted" : "")}><b>{email}</b></a>
                     </nav>
                 );
             }).catch((error) => {
@@ -38,13 +42,13 @@ export default function Topbar() {
     }, []);
     
 
-    let selected = 0;
 
+    // check if the current page is slected
     const navitems = [
         <a href="/" className={"nav-item " + (selected == 0 ? "selected" : "")} key="1">Home</a>,
         <a href="/browse" className={"nav-item " + (selected == 1 ? "selected" : "")} key="2">Browse</a>,
-        <a href="/settings" className={'nav-item' + (selected == 2 ? "selected": "")} key="3">Settings</a> 
-    ]
+        <a href="/settings" className={'nav-item ' + (selected == 2 ? "selected": "")} key="3">Settings</a> 
+    ];
 
     return (
         <header>
@@ -52,8 +56,10 @@ export default function Topbar() {
                 <img src={USU_logo} alt="USU Logo" />
                 <span>MandA Aggie Marketplace</span>
                 {navitems}
+                <input type="text" placeholder="Search"/>
+                <button type="button"><span class="material-symbols-outlined">search</span></button>
             </nav>
             {accountSection}
         </header>
-    ) 
+    );
 }

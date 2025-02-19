@@ -23,4 +23,16 @@ public class PagesController : Controller
     {
         return File("index.html", "text/html");
     }
+
+    [HttpGet("browse")]
+    public IActionResult Browse()
+    {
+        return File("index.html", "text/html");
+    }
+
+    [HttpGet("settings")]
+    public IActionResult Settings()
+    {
+        return File("index.html", "text/html");
+    }
 }

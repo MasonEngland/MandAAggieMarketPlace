@@ -1,20 +1,22 @@
 import axios from 'axios'
 import { useState } from 'react';
 import Cookies from 'js-cookie';
+import "../css/login.css";
+
 
 export default function Login() {
-    const [ email, setEmail ] = useState("")
-    const [ password, setPassword ] = useState("")
+    const [ email, setEmail ] = useState("");
+    const [ password, setPassword ] = useState("");
 
     const handleSubmit = async (e) => {
-        e.preventDefault()
+        e.preventDefault();
         
         const response = await axios.post("http://localhost:2501/Api/Auth/Login", {
             Email: email,
             Password: password,
             FirstName: "",
             LastName: "",
-        })
+        });
         Cookies.set('token', response.data.token, { expires: 7});
         console.log(Cookies.get('token'));
     }
@@ -29,5 +31,5 @@ export default function Login() {
                 <button type="button" onClick={(e) => handleSubmit(e)}>Login</button>
             </form>
         </div>
-    )
+    );
 }

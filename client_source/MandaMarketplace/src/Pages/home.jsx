@@ -4,7 +4,7 @@ export default function Home() {
     return (
         
         <div>
-            <Topbar />
+            <Topbar pageNumber={0}/>
             <h1>Home</h1>
         </div>
     )

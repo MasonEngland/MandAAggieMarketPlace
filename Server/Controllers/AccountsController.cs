@@ -18,7 +18,7 @@ public class AccountsController : Controller
     // just a help function to deserialize token data
     private Account? GetAccount()
     {
-        string? data = Convert.ToString(HttpContext.Items["tokendata"]);
+        string? data = Convert.ToString(HttpContext.Items["tokenData"]);
         if (data == null) 
         {
             return null; 
@@ -99,5 +99,17 @@ public class AccountsController : Controller
             success = true,
             content = Items,
         });
+    }
+
+    [HttpGet("GetAccount")]
+    public IActionResult GetOneAccount()
+    {
+        Account? account = GetAccount();
+        if (account == null)
+        {
+            return Unauthorized(new { success = false });
+        }
+
+        return Ok(new { success = true, account = account });
     }
 }

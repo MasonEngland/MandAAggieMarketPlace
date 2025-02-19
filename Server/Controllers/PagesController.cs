@@ -17,4 +17,10 @@ public class PagesController : Controller
     {
         return File("index.html", "text/html");
     }
+
+    [HttpGet("login")]
+    public IActionResult Login()
+    {
+        return File("index.html", "text/html");
+    }
 }

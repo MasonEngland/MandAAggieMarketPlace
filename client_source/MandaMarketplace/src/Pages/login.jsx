@@ -1,5 +1,6 @@
 import axios from 'axios'
 import { useState } from 'react';
+import Cookies from 'js-cookie';
 
 export default function Login() {
     const [ email, setEmail ] = useState("")
@@ -7,8 +8,6 @@ export default function Login() {
 
     const handleSubmit = async (e) => {
         e.preventDefault()
-
-        console.log(password);
         
         const response = await axios.post("http://localhost:2501/Api/Auth/Login", {
             Email: email,
@@ -16,7 +15,8 @@ export default function Login() {
             FirstName: "",
             LastName: "",
         })
-        console.log(response)
+        Cookies.set('token', response.data.token, { expires: 7});
+        console.log(Cookies.get('token'));
     }
 
 

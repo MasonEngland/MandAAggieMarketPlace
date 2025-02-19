@@ -22,6 +22,7 @@ public class AuthToken : IMiddleware
 
         if (headers == null)
         {
+            context.Response.StatusCode = 401;
             await context.Response.WriteAsync("Auth header was null");
             return;
         }

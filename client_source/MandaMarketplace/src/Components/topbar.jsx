@@ -1,5 +1,5 @@
 import React from 'react';
-import '../css/topbar.css';
+import styles from '../css/topbar.module.css';
 import USU_logo from '../assets/USU_logo.jpg';
 import Cookies from 'js-cookie';
 import axios from 'axios';
@@ -11,12 +11,12 @@ export default function Topbar(props) {
 
     // initialize account section to be login and register
     const [ accountSection, setAccountSection ] = useState(
-        <nav>
-            <a href="/login" className={"nav-item" + (selected == 3 ? "selcted" : "")}>
-                <b>Login</b>
+        <nav className={styles.nav}>
+            <a href="/login" className={styles.a + " " + (selected == 3 ? styles.selected : "")}>
+                <b className={styles.b}>Login</b>
             </a>
-            <a href="/register" className={"nav-item" + (selected == 4 ? "selcted" : "")}>
-                <b>Register</b>
+            <a href="/register" className={styles.a + " " + (selected == 4 ? styles.selected : "")}>
+                <b className={styles.b}>Register</b>
             </a>
         </nav>
     );
@@ -32,7 +32,7 @@ export default function Topbar(props) {
                 let email = response.data.account.email
                 setAccountSection(
                     <nav>
-                        <a href="/account" className={"nav-item" + (selected == 5 ? "selcted" : "")}><b>{email}</b></a>
+                        <a href="/account" className={styles.a + " " + (selected == 5 ? styles.selected : "")}><b className={styles.b}>{email}</b></a>
                     </nav>
                 );
             }).catch((error) => {
@@ -45,19 +45,19 @@ export default function Topbar(props) {
 
     // check if the current page is slected
     const navitems = [
-        <a href="/" className={"nav-item " + (selected == 0 ? "selected" : "")} key="1">Home</a>,
-        <a href="/browse" className={"nav-item " + (selected == 1 ? "selected" : "")} key="2">Browse</a>,
-        <a href="/settings" className={'nav-item ' + (selected == 2 ? "selected": "")} key="3">Settings</a> 
+        <a href="/" className={styles.a + " " + (selected == 0 ? styles.selected : "")} key="1">Home</a>,
+        <a href="/browse" className={styles.a + " "  + (selected == 1 ? styles.selected: "")} key="2">Browse</a>,
+        <a href="/settings" className={styles.a + " " +  (selected == 2 ? styles.selected: "")} key="3">Settings</a> 
     ];
 
     return (
-        <header>
-            <nav>
-                <img src={USU_logo} alt="USU Logo" />
-                <span>MandA Aggie Marketplace</span>
+        <header className={styles.header}>
+            <nav className={styles.nav}>
+                <img id="logo" src={USU_logo} alt="USU Logo" className={styles.img} />
+                <span className={styles.span} id ="title">MandA Aggie Marketplace</span>
                 {navitems}
-                <input type="text" placeholder="Search"/>
-                <button type="button"><span class="material-symbols-outlined">search</span></button>
+                <input type="text" placeholder="Search" className={styles.input}/>
+                <button type="button" className={styles.button}><span id="material-symbols-outlined" className={styles.button + styles.materialSymbolsOutlined}>search</span></button>
             </nav>
             {accountSection}
         </header>

@@ -1,4 +1,8 @@
-header {
+* {
+    font-family: 'Lucida Sans', 'Lucida Sans Regular', 'Lucida Grande', 'Lucida Sans Unicode', Geneva, Verdana, sans-serif;
+}
+
+.header {
     display: flex;
     justify-content: space-between;
     align-items: center;
@@ -8,22 +12,21 @@ header {
     min-width: 1100px;
 }
 
-header > * {
+.header > * {
     background-color: inherit;
 }
 
-nav {
+.nav {
     display: flex;
     align-items: center;
     margin-right: 100px;
 }
 
-span {
+.span {
     background-color: white;
 }
 
-.nav-item {
-    background-color: white;
+.nav > a {
     margin-left: 10px;
     margin-right: 10px;
     display: flex;
@@ -31,56 +34,69 @@ span {
     justify-content: center;
     width: 80px;
     height: 40px;
-    color: black;
-    background-color: none;
     border-radius: 1px;
 }
 
-.selected {
-    background-color: #0E103D;
-    color: white;
+
+.b {
+    background-color: white;
 }
 
-img {
+.img {
     width: 100px;
     height: 100px;
 }
 
-a {
+.a {
     text-decoration: none;
+    background-color: inherit;
+    color: black;
 }
-a:hover {
+.a:hover {
     text-decoration: underline;
     cursor: pointer;
 }
 
-b {
-    background-color: inherit;
+.b {
+    background-color: white;
 }
 
-button {
+.button {
     border: none;
     width: 80px;
     height: 40px;
     background-color: #0E103D;
 }
 
-button > span {
+.button > span {
     background-color: inherit;
+    height: 50px;
     color: white;
+    font-family: 'Material Symbols Outlined';
+    font-size: 18px;
 }
 
-button:hover {
+.button:hover {
     cursor: pointer;
 }
 
+.selected {
+    background-color: #0E103D;
+    color: white;
+}
+.selected:hover {
+    text-decoration: none;
+    cursor: default !important;
+}
 
-input {
+
+.input {
     border: none;
     width: 200px;
     height: 38px;
     text-indent: 10px;
     font-size: 14px;
+    background-color: rgb(235, 235, 235);
 }
 
 
@@ -92,7 +108,7 @@ input {
     src: url(https://fonts.gstatic.com/icon/font?kit=kJF1BvYX7BgnkSrUwT8OhrdQw4oELdPIeeII9v6oDMzByHX9rA6RzaxHMPdY43zj-jCxv3fzvRNU22ZXGJpEpjC_1v-p_4MrImHCIJIZrDCvHOelbd5zrDAtg9Nr-tWP_MY&skey=b8dc2088854b122f&v=v226) format('woff');
   }
   
-  .material-symbols-outlined {
+  .materialSymbolsOutlined {
     font-family: 'Material Symbols Outlined';
     font-weight: normal;
     font-style: normal;

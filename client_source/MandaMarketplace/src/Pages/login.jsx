@@ -1,7 +1,6 @@
 import axios from 'axios'
 import { useState } from 'react';
 import Cookies from 'js-cookie';
-import "../css/login.css";
 
 
 export default function Login() {

@@ -1,0 +1,47 @@
+.card {
+    width: 300px;
+    min-width: 300px;
+    height: 300px;
+    display: flex; 
+    align-items: center;
+    flex-direction: column;
+    justify-content: space-around;
+    text-align: center;
+    background-color: #ffffff;
+    border: 1px solid #000000;
+    color: rgb(0, 0, 0);
+    box-shadow: -8px 8px 8px 5px rgba(0, 0, 0, 0.5);
+    padding-top: 30px;
+    padding-bottom: 30px;
+    border-radius: 4px;
+    margin: 30px;
+}
+
+.span, .h3 {
+    background-color: inherit;
+}
+
+.card > img {
+    max-height: 150px;
+    min-height: 150px;
+    border-radius: 4px;
+}
+
+.card > * {
+    margin: 10px;
+}
+
+.card > button {
+    background-color: #0E103D;
+    width: 80%;
+    color: white;
+    border: none;
+    padding: 10px;
+    border-radius: 5px;
+    cursor: pointer;
+    font-size: 16px;
+}
+
+.card > h3 {
+    font-family:'Courier New', Courier, monospace
+}

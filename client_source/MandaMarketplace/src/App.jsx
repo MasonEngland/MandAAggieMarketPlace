@@ -3,7 +3,7 @@ import Home from './Pages/home'
 import Login from './Pages/login'
 import Browse from './Pages/browse'
 import Settings from './Pages/settings'
-import './css/App.css'
+import './css/app.css'
 
 function App() {
   return (

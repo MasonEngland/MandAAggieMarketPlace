@@ -45,7 +45,7 @@ public class CommerceController : Controller
          * */
         try 
         {
-            List<Item> stock = _db.CurrentStock.Take(10 * queries).ToList<Item>();
+            List<Item> stock = _db.CurrentStock.Take(10 * queries).ToList();
             return new 
             {
                 stock,
@@ -81,7 +81,7 @@ public class CommerceController : Controller
         Account? account = GetAccount();
         if (account == null)    
         {
-            return Unauthorized("token could not be deserialized");
+            return Redirect("/login");
         }
 
         if (account.Balance - item.Price < 0)
@@ -103,6 +103,7 @@ public class CommerceController : Controller
 
             if (item.Stock > dbItem[0].Stock || item.Stock == 0)
             {
+                HttpContext.Response.StatusCode = 400;
                 return new 
                 {
                     success = false,

@@ -13,6 +13,8 @@ public class Account
     public string Password {get; set;}
 
     public float Balance { get; set; }
+
+    public bool Admin { get; set; }
  
     public DateTime Date {get; set;} 
 

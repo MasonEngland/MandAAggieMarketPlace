@@ -44,8 +44,8 @@ public class AuthController : Controller
                 LastName = account.LastName,
                 Email = account.Email,
                 Password = HashPassword(account.Password),
-                Balance = 0.0f
-                
+                Balance = 0.0f,
+                Admin = false
             });
             _db.SaveChanges();
 
@@ -61,10 +61,20 @@ public class AuthController : Controller
     [HttpPost("Login")]
     public object login([FromBody] Account account) 
     {
+        /**
+        * requires a full acount object be passed in the request body
+        * required fields are Email, Password
+        * will return a JWT as well as the account information if authentication is successful
+        */
         string secret = Environment.GetEnvironmentVariable("ACCESS_TOKEN_SECRET")!; 
         
         try 
         {
+            if (account.Email == null || account.Password == null) 
+            {
+                return BadRequest("body of request is invalid");
+            }
+
             Account[] gotAccount = _db.accounts
                 .Where(item => item.Email.ToLower() == account.Email.ToLower())
                 .ToArray();
@@ -80,6 +90,8 @@ public class AuthController : Controller
                 return Unauthorized("Password is incorrect");
             }
 
+            // TODO: make a secure way to obtain admin privilage
+
             var token = JwtBuilder
                 .Create()
                 .WithAlgorithm(new HMACSHA256Algorithm())
@@ -89,7 +101,7 @@ public class AuthController : Controller
                 .AddClaim("Password", gotAccount[0].Password)
                 .AddClaim("FirstName", gotAccount[0].FirstName)
                 .AddClaim("LastName", gotAccount[0].LastName)
-                .AddClaim("Admin", false)
+                .AddClaim("Admin", gotAccount[0].Admin)
                 .Encode();
 
             return new 

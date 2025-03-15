@@ -20,8 +20,7 @@ export default function Topbar(props) {
             </a>
         </nav>
     );
-
-
+    
     // check if user is logged in
     useEffect(() => {
         let token = Cookies.get('token');
@@ -41,8 +40,6 @@ export default function Topbar(props) {
         }
     }, []);
     
-
-
     // check if the current page is slected
     const navitems = [
         <a href="/" className={styles.a + " " + (selected == 0 ? styles.selected : "")} key="1">Home</a>,

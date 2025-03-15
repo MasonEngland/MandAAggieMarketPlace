@@ -36,6 +36,11 @@ export default function Home() {
                 {cardData.map((data, index) => {
                     return <Card data={data} key={index}/>
                 })}
+                <Card data={cardData[0]}/>
+                <Card data={cardData[0]}/>
+                <Card data={cardData[0]}/>  
+                <Card data={cardData[0]}/>
+                <Card data={cardData[0]}/>
             </div>
         </div>
     )

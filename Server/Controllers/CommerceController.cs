@@ -157,6 +157,15 @@ public class CommerceController : Controller
              *
              * adds as many items as the value of Item.stock in the request body 
              */
+
+            // TODO: add a good admin check and remove the comment below
+            // Account account = GetAccount()!;
+            // if (account == null || !account.Admin) 
+            // {
+            //     return Redirect("/login");
+            // }
+            
+            
             Item[] dbResults = _db.CurrentStock
                 .Where(i => i.Id == item.Id || i.Name == item.Name)
                 .ToArray();

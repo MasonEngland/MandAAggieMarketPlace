@@ -16,8 +16,7 @@ export default function Home() {
     }]);
 
     useEffect(() => {
-        let token = Cookies.get('token');
-        axios.get("http://localhost:2501/Api/Commerce/GetStock/1", {headers: {"authorization": 'Bearer ' + token}})
+        axios.get("http://localhost:2501/Api/Commerce/GetStock/1")
         .then((response) => {
             console.log(response.data);
             setCardData(response.data.stock);

@@ -3,6 +3,7 @@ import Home from './Pages/home'
 import Login from './Pages/login'
 import Browse from './Pages/browse'
 import Settings from './Pages/settings'
+import Item from './Pages/item'
 import './css/app.css'
 
 function App() {
@@ -13,6 +14,7 @@ function App() {
         <Route path="/browse" element={<Browse />} />
         <Route path="/login" element={<Login />} />
         <Route path="/settings" element={<Settings />} />
+        <Route path="/item" element={<Item />}  />
       </Routes>
     </BrowserRouter>
   )

@@ -200,4 +200,30 @@ public class CommerceController : Controller
             };
         }
     } 
+
+    [HttpGet("GetItem/{id}")]
+    public object GetItem(string id) 
+    {
+        try 
+        {
+            Item[] dbResults = _db.CurrentStock
+                .Where(i => Convert.ToString(i.Id) == id)
+                .ToArray();
+
+            if (dbResults.Length < 1) 
+            {
+                return NotFound();
+            }
+
+            return new 
+            {
+                item = dbResults[0],
+                success = true
+            };
+        } catch (Exception err) 
+        {
+            Console.WriteLine(err.Message);
+            return StatusCode(500);
+        }
+    }
 }

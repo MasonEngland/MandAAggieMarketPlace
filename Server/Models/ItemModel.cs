@@ -7,6 +7,8 @@ public class Item
 
     public int Stock { get; set; } 
 
+    public string Description { get; set; }
+
     public Guid Id { get; set; }
 
     public float Price { get; set; }

@@ -1,33 +1,31 @@
 import Topbar from '../Components/topbar';
 import styles from '../css/item.module.css';
-import img from '../assets/USU_logo.jpg';
 import { useState, useEffect } from 'react';
 import { useSearchParams } from 'react-router-dom';
 import axios from 'axios';
 import cookies from 'js-cookie';
 
 export default function Item(props) {
+
+    // define state variables
     const [item, setItem] = useState({});
     const [searchParams] = useSearchParams();
+    const [quantity, setQuantity] = useState(0);
+    const [address, setAddress] = useState('');
 
-    
 
+    // fetch item data from server
     useEffect(() => {
         const id = searchParams.get('item');
-        const token = cookies.get('token');
 
         if (!id || id === '') {
             location.href = '/home';
-        }
-        else if (!token || token === '') {
-            location.href = '/login';
         }
 
         axios.get(`http://localhost:2501/Api/Commerce/GetItem/${id}`)
         .then(res => {
             if (res.data.success === true) {
                 setItem(res.data.item);
-                console.log(res.data.item);
             }
             else {
                 alert(res.data.message);
@@ -35,11 +33,55 @@ export default function Item(props) {
         })
         .catch(err => {
             alert(err);
-            location.replace("/home");
+            location.replace("/");
         });
     },[]);
 
+    const purchase = () => {
+        let token = "";
+        try {
+            token = cookies.get('token');
+        } catch (err) {
+            console.log(err);
+            return;
+        }
+        const id = item.id;
 
+        if (address === '' || quantity === 0) {
+            alert('Please enter an address and quantity');
+            return;
+        }
+
+        if (!token || token === '') {
+            location.href = '/login';
+        }
+        else if (!id || id === '') {
+            location.href = '/home';
+        }
+
+        item.stock = quantity;
+
+        axios.post(`http://localhost:2501/Api/Commerce/Purchase/${id}`, {
+            ...item
+        }, {
+            headers: {
+                'Authorization': `Bearer ${token}`
+            }
+        })
+        .then(res => {
+            if (res.data.success === true) {
+                console.log(res);
+                alert(res.data.message);
+                location.href = '/';
+            }
+            else {
+                alert(res.data.message);
+            }
+        })
+        .catch(err => {
+            alert(err);
+        });
+    }
 
 
     return (
@@ -57,10 +99,11 @@ export default function Item(props) {
                         Stock: {item.stock}
                         </span>
                     <span>Recieve within 10 days</span>
-                    <span>
-                            <input type="number" placeholder="Quantity" className={styles.input}/>
+                    <span className={styles.inputContainer}>
+                        <input type="number" placeholder="Quantity" className={styles.input} onChange={(e) => setQuantity(e.target.value)}/>
+                        <input type="text" placeholder="Address" className={styles.input} onChange={(e) => setAddress(e.target.value)}/>
                     </span>
-                    <button className={styles.button}>Purchase</button>
+                    <button className={styles.button} style={{cursor: 'pointer'}} onClick={() => purchase()}>Purchase</button>
                 </div>
             </div>
         </div>

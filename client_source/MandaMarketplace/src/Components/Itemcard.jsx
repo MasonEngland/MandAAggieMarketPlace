@@ -1,5 +1,4 @@
 import styles from '../css/itemcard.module.css';
-import {useSearchParams } from 'react-router-dom';
 
 export default function Itemcard(props) {
     
@@ -13,7 +12,7 @@ export default function Itemcard(props) {
             <h3 className={styles.h3}>{props.data.name}</h3>
             <span className={styles.span}>Price: ${props.data.price}</span>
             <span className={styles.span}>Stock: {props.data.stock}</span>
-            <button onClick={() => clickHandler()}>Purchase</button>
+            <button onClick={() => clickHandler()}>Details</button>
         </div>
     )
 }

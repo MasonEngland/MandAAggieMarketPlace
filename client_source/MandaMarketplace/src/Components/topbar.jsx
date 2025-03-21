@@ -24,20 +24,20 @@ export default function Topbar(props) {
     // check if user is logged in
     useEffect(() => {
         let token = Cookies.get('token');
-        console.log(token);
-        if (token) {
-            axios.get("http://localhost:2501/Api/Accounts/GetAccount", {headers: {"authorization": 'Bearer ' + token}})
-            .then((response) => {
-                let email = response.data.account.email
-                setAccountSection(
-                    <nav>
-                        <a href="/account" className={styles.a + " " + (selected == 5 ? styles.selected : "")}><b className={styles.b}>{email}</b></a>
-                    </nav>
-                );
-            }).catch((error) => {
-                console.log(error);
-            });
-        }
+
+        if (!token || token == "") return;
+
+        axios.get("http://localhost:2501/Api/Accounts/GetAccount", {headers: {"authorization": 'Bearer ' + token}})
+        .then((response) => {
+            let email = response.data.account.email
+            setAccountSection(
+                <nav>
+                    <a href="/account" className={styles.a + " " + (selected == 5 ? styles.selected : "")}><b className={styles.b}>{email}</b></a>
+                </nav>
+            );
+        }).catch((error) => {
+            console.log(error);
+        });
     }, []);
     
     // check if the current page is slected

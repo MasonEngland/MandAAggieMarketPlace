@@ -20,7 +20,7 @@ public class CommerceController : Controller
     // Helper function for deserializing the account info from token data  
     private Account? GetAccount()
     {
-        string? data = Convert.ToString(HttpContext.Items["tokendata"]);
+        string? data = Convert.ToString(HttpContext.Items["tokenData"]);
         if (data == null) 
         {
             return null; 
@@ -60,7 +60,7 @@ public class CommerceController : Controller
     
 
     [HttpPost("Purchase/{address}")]
-    public object Purchase([FromBody] Item item, String address)    
+    public object Purchase([FromBody] Item item, string address)    
     {
         /*
          *
@@ -103,7 +103,7 @@ public class CommerceController : Controller
 
             if (item.Stock > dbItem[0].Stock || item.Stock == 0)
             {
-                HttpContext.Response.StatusCode = 400;
+                //HttpContext.Response.StatusCode = 400;
                 return new 
                 {
                     success = false,
@@ -136,7 +136,8 @@ public class CommerceController : Controller
                 orderedItem = dbItem[0],
                 addressTo = address,
                 cost = -dbItem[0].Price,
-                success = true
+                success = true,
+                message = "purchase successful"
             };
         } catch (Exception err) 
         {

@@ -87,5 +87,10 @@
 
 }
 
+.inputContainer > * {
+    margin-top: 15px;
+    text-indent: 10px;
+}
+
 
 

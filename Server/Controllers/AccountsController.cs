@@ -112,4 +112,61 @@ public class AccountsController : Controller
 
         return Ok(new { success = true, account = account });
     }
+
+    // Route: /Api/Accounts/Update
+    [HttpPut("Update")]
+    public IActionResult UpdateAccount([FromBody] Account account)
+    {
+        Account? currentAccount = GetAccount();
+        if (currentAccount == null)
+        {
+            return Unauthorized(new { success = false });
+        }
+
+        if (currentAccount.Id != account.Id)
+        {
+            return Unauthorized(new { success = false });
+        }
+
+        _db.accounts
+            .Where(h => h.Id == account.Id)
+            .ExecuteUpdate(setter => setter
+                .SetProperty(b => b.FirstName, account.FirstName)
+                .SetProperty(b => b.LastName, account.LastName)
+                .SetProperty(b => b.Email, account.Email)
+            );
+
+        return Ok(new { success = true , account });
+    }
+
+    // Route: /Api/Accounts/UpdatePassword
+    [HttpPut("UpdatePassword")]
+    public IActionResult UpdatePassword([FromBody] Account account)
+    {
+        Account? currentAccount = GetAccount();
+        if (currentAccount == null)
+        {
+            return Unauthorized(new { success = false });
+        }
+
+        if (currentAccount.Id != account.Id)
+        {
+            return Unauthorized(new { success = false });
+        }
+
+        try
+        {
+            _db.accounts
+            .Where(h => h.Id == account.Id)
+            .ExecuteUpdate(setter => setter
+                .SetProperty(b => b.Password, account.Password)
+            );
+        } catch (Exception err)
+        {
+            Console.WriteLine(err.Message);
+            return StatusCode(500);
+        }
+
+        return Ok(new { success = true });
+    }
 }

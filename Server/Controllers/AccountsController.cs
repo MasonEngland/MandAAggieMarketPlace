@@ -3,6 +3,9 @@ using Server.Context;
 using Microsoft.AspNetCore.Mvc;
 using System.Text.Json;
 using Microsoft.EntityFrameworkCore;
+using JWT.Builder;
+using JWT.Algorithms;
+using Microsoft.Net.Http.Headers;
 
 
 [Route("Api/Accounts")]
@@ -110,6 +113,7 @@ public class AccountsController : Controller
             return Unauthorized(new { success = false });
         }
 
+
         return Ok(new { success = true, account = account });
     }
 
@@ -128,6 +132,10 @@ public class AccountsController : Controller
             return Unauthorized(new { success = false });
         }
 
+        if (account.FirstName == "" || account.LastName == "" || account.Email == "") {
+            return BadRequest(new { success = false, message = "field missing" });
+        }
+
         _db.accounts
             .Where(h => h.Id == account.Id)
             .ExecuteUpdate(setter => setter
@@ -135,8 +143,28 @@ public class AccountsController : Controller
                 .SetProperty(b => b.LastName, account.LastName)
                 .SetProperty(b => b.Email, account.Email)
             );
+        
+        Account[] gotAccount = _db.accounts.Where(h => h.Id == account.Id).ToArray();
 
-        return Ok(new { success = true , account });
+        string secret = Environment.GetEnvironmentVariable("ACCESS_TOKEN_SECRET")!;
+        string token = JwtBuilder
+            .Create()
+            .WithAlgorithm(new HMACSHA256Algorithm())
+            .WithSecret(secret)
+            .AddClaim("Id", gotAccount[0].Id)
+            .AddClaim("Email", gotAccount[0].Email)
+            .AddClaim("Password", gotAccount[0].Password)
+            .AddClaim("FirstName", gotAccount[0].FirstName)
+            .AddClaim("LastName", gotAccount[0].LastName)
+            .AddClaim("Admin", gotAccount[0].Admin)
+            .Encode();
+        
+        
+        // TODO: find a way to set the Set-Cookie header in response 
+        var cookie = new SetCookieHeaderValue("testCookie", "myValue");
+        cookie.Expires = DateTimeOffset.Now.AddDays(1);
+        Request.Headers.Append("Set-Cookie", cookie.ToString());
+        return Ok(new { success = true, account, token });
     }
 
     // Route: /Api/Accounts/UpdatePassword

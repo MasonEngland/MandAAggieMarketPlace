@@ -18,7 +18,7 @@ public class AuthController : Controller
     }
 
     [HttpPost("Create")]
-    public object create([FromBody] Account account)
+    public object Create([FromBody] Account account)
     {
         if (account.Email == null || 
             account.Password == null || 
@@ -59,7 +59,7 @@ public class AuthController : Controller
     }
 
     [HttpPost("Login")]
-    public object login([FromBody] Account account) 
+    public object Login([FromBody] Account account) 
     {
         /**
         * requires a full acount object be passed in the request body

@@ -26,10 +26,11 @@ public class Program
         var app = builder.Build();
 
         app.UseCors(builder => {
-            builder.AllowAnyOrigin();
+            builder.WithOrigins("http://localhost:5173");
             builder.AllowAnyMethod();
             builder.AllowAnyHeader();
         });
+
         app.UseAuthorization();
         
 

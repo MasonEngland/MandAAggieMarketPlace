@@ -15,7 +15,7 @@ export default function Topbar(props) {
             <a href="/login" className={styles.a + " " + (selected == 3 ? styles.selected : "")}>
                 <b className={styles.b}>Login</b>
             </a>
-            <a href="/register" className={styles.a + " " + (selected == 4 ? styles.selected : "")}>
+            <a href="/signup" className={styles.a + " " + (selected == 4 ? styles.selected : "")}>
                 <b className={styles.b}>Register</b>
             </a>
         </nav>
@@ -32,7 +32,7 @@ export default function Topbar(props) {
             let email = response.data.account.email
             setAccountSection(
                 <nav>
-                    <a href="/account" className={styles.a + " " + (selected == 5 ? styles.selected : "")}><b className={styles.b}>{email}</b></a>
+                    <a href="/settings" className={styles.a + " " + (selected == 5 ? styles.selected : "")}><b className={styles.b}>{email}</b></a>
                 </nav>
             );
         }).catch((error) => {

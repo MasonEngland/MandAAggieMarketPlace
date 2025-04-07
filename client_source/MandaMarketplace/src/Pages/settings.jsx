@@ -82,6 +82,7 @@ export default function Settings() {
                     Email: <br />
                     <input className={styles.input} type="text" value={account?.email} onChange={(e) => setAccount(prev => {return {...prev, email: e.target.value}})}/>
                 </label>
+                <h4>Balance: ${account?.balance}</h4>
                 <button className={styles.button} onClick={() => updateAccount()}>Save Changes</button>
                 <button className={styles.button}>Change Password</button>
                 <button className={styles.button} onClick={() => location.href = "/addFunds"}>Add Funds</button>

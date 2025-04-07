@@ -33,7 +33,7 @@ export default function Login() {
                 <input className={styles.input} type="text" placeholder="Email" onChange={(e) => setEmail(e.target.value)}/>
                 <input className={styles.input} type="password" placeholder="Password" onChange={(e) => setPassword(e.target.value)}/>
                 <button className={styles.button} type="button" onClick={(e) => handleSubmit(e)}>Login</button>
-                <button className={styles.button + " " + styles.signup} type="button" onClick={() => window.location.href = "/register"}>Sign Up</button>
+                <button className={styles.button + " " + styles.signup} type="button" onClick={() => window.location.href = "/signup"}>Sign Up</button>
                 <span>didn't want to login or signup? <a href="/" className={styles.a}>return</a></span>
             </form>
             

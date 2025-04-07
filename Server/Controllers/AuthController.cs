@@ -20,6 +20,9 @@ public class AuthController : Controller
     [HttpPost("Create")]
     public object Create([FromBody] Account account)
     {
+        string secret = Environment.GetEnvironmentVariable("ACCESS_TOKEN_SECRET")!; 
+
+
         if (account.Email == null || 
             account.Password == null || 
             account.FirstName == null || 
@@ -39,17 +42,37 @@ public class AuthController : Controller
                 return BadRequest("Email already taken");
             }
 
-            _db.accounts.Add(new Account() {
+            Account createdAccount = new Account() {
                 FirstName = account.FirstName,
                 LastName = account.LastName,
                 Email = account.Email,
                 Password = HashPassword(account.Password),
                 Balance = 0.0f,
                 Admin = false
-            });
+            };
+            _db.accounts.Add(createdAccount);
             _db.SaveChanges();
 
-            return StatusCode(201);
+            var token = JwtBuilder
+                .Create()
+                .WithAlgorithm(new HMACSHA256Algorithm())
+                .WithSecret(secret)
+                .AddClaim("Id", createdAccount.Id)
+                .AddClaim("Email", createdAccount.Email)
+                .AddClaim("Password", createdAccount.Password)
+                .AddClaim("FirstName", createdAccount.FirstName)
+                .AddClaim("LastName", createdAccount.LastName)
+                .AddClaim("Admin", createdAccount.Admin)
+                .Encode();
+
+
+            HttpContext.Response.StatusCode = 201;
+            return new 
+            {
+                Success = true,
+                Account = createdAccount,
+                Token = token
+            };
             
         } catch (Exception err)
         {

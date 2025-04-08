@@ -25,6 +25,7 @@ public class Program
 
         var app = builder.Build();
 
+        //TODO: remove during deployment
         app.UseCors(builder => {
             builder.WithOrigins("http://localhost:5173");
             builder.AllowAnyMethod();

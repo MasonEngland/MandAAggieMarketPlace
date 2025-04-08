@@ -5,6 +5,7 @@ import Browse from './Pages/browse'
 import Settings from './Pages/settings'
 import Item from './Pages/item'
 import Signup from './Pages/signup'
+import AddFunds from './Pages/addfunds'
 import './css/app.css'
 
 function App() {
@@ -17,6 +18,7 @@ function App() {
         <Route path="/settings" element={<Settings />} />
         <Route path="/item" element={<Item />}  />
         <Route path="/signup" element={<Signup />} />
+        <Route path="/addfunds" element={<AddFunds />} />
       </Routes>
     </BrowserRouter>
   )

@@ -45,6 +45,11 @@ export default function Item(props) {
             console.log(err);
             return;
         }
+        if (token === null || token === undefined || token === "") {
+            location.href = '/login';
+            return;
+        }
+
         const id = item.id;
 
         if (address === '' || quantity === 0) {

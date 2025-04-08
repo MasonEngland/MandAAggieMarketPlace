@@ -18,9 +18,14 @@ export default function Login() {
             FirstName: "",
             LastName: "",
         });
-        Cookies.set('token', response.data.token, { expires: 7});
-        console.log(Cookies.get('token'));
-        location.href = "/";
+        if (response.data.success) {
+
+            Cookies.set('token', response.data.token, { expires: 7});
+            location.href = "/";
+        } 
+        else {
+            alert("Login failed. Please check your email and password.");
+        }
     }
 
 

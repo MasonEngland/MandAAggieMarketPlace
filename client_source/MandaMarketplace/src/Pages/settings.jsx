@@ -15,7 +15,7 @@ export default function Settings() {
         let token = Cookies.get('token');
 
         if (token === null || token === undefined || token === "") {
-            window.location.href = "/login";
+            window.location.replace("/login");
             return;
         }
         

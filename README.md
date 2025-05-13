@@ -5,7 +5,7 @@ this is a fake ecommerce type set meant to help learn about website architecture
 
 ### How to run 
 
-once cloned you need to enter the server directory and create an appsettings.json with a db connection string, my database is not public so will you have to use your own. you will also need to create a .env file with a variable named ACESS_TOKEN_SECRET this is how we can make secure jwts. finally you can use ` $ dotnet run ` to start the server. by default the server runs on port 2501 but this can be changed in the appsettings.json you create. 
+once cloned you need to enter the server directory and create an appsettings.json with a db connection string, my database is not public so will you have to use your own. you will also need to create a .env file with a variable named ACCESS_TOKEN_SECRET this is how we can make secure jwts. finally you can use ` $ dotnet run ` to start the server. by default the server runs on port 2501 but this can be changed in the appsettings.json you create. 
 
 
 ### technologies

@@ -60,7 +60,7 @@ public class CommerceController : Controller
     
 
     [HttpPost("Purchase/{address}")]
-    public object Purchase([FromBody] Item item, string address)    
+    public async Task<IActionResult> Purchase([FromBody] Item item, string address)    
     {
         /*
          *
@@ -86,11 +86,11 @@ public class CommerceController : Controller
 
         if (account.Balance - item.Price < 0)
         {
-            return new 
+            return Unauthorized(new 
             {
                 success = false,
                 message = "Not enough funds"
-            };
+            });
         }
 
         try 
@@ -104,22 +104,22 @@ public class CommerceController : Controller
             if (item.Stock > dbItem[0].Stock || item.Stock == 0)
             {
                 //HttpContext.Response.StatusCode = 400;
-                return new 
+                return BadRequest(new 
                 {
                     success = false,
                     message = "Not enough items in stock"
-                };
+                });
             }
 
             // lower the item stock by the amount requested
-            _db.CurrentStock
+            await _db.CurrentStock
                 .Where(h => h.Id == item.Id)
-                .ExecuteUpdate(setter => setter.SetProperty(b => b.Stock, b => b.Stock - item.Stock));
+                .ExecuteUpdateAsync(setter => setter.SetProperty(b => b.Stock, b => b.Stock - item.Stock));
 
             // remove the money from the clients account to pay for the product 
-            _db.accounts
+            await _db.accounts
                 .Where(item => item.Id == account.Id)
-                .ExecuteUpdate(setter => setter.SetProperty(b => b.Balance, account.Balance - item.Price));
+                .ExecuteUpdateAsync(setter => setter.SetProperty(b => b.Balance, account.Balance - item.Price));
 
             
             _db.OrderQueue.Add(new Order() {
@@ -127,18 +127,18 @@ public class CommerceController : Controller
                 OwnerId = Convert.ToString(account.Id)!, 
                 Adress = address
             });
-            _db.SaveChanges();
+            await _db.SaveChangesAsync();
 
             
             //return a reciet noting the tansaction details
-            return new 
+            return Ok(new 
             {
                 orderedItem = dbItem[0],
                 addressTo = address,
                 cost = -dbItem[0].Price,
                 success = true,
                 message = "purchase successful"
-            };
+            });
         } catch (Exception err) 
         {
             System.Console.WriteLine(err.Message);
@@ -147,7 +147,7 @@ public class CommerceController : Controller
     }
 
     [HttpPost("Restock")]
-    public object AddToCurrentStock([FromBody] Item item)
+    public async Task<IActionResult> AddToCurrentStock([FromBody] Item item)
     {
         try 
         {
@@ -167,60 +167,59 @@ public class CommerceController : Controller
             // }
             
             
-            Item[] dbResults = _db.CurrentStock
+            Item[] dbResults = await _db.CurrentStock
                 .Where(i => i.Id == item.Id || i.Name == item.Name)
-                .ToArray();
+                .ToArrayAsync();
 
             if (dbResults.Length >= 1)
             {
-                _db.CurrentStock
+                await _db.CurrentStock
                 .Where(h => h.Id == item.Id || h.Name == item.Name)
-                .ExecuteUpdate(setter => setter.SetProperty(b => b.Stock, b => b.Stock + item.Stock));
+                .ExecuteUpdateAsync(setter => setter.SetProperty(b => b.Stock, b => b.Stock + item.Stock));
 
-                return new 
+                return Ok(new 
                 {
                     success = true
-                };
+                });
             }
 
             _db.CurrentStock.Add(item);
-            _db.SaveChanges();
+            await _db.SaveChangesAsync();
 
-            return new 
+            return Created($"/Api/Commerce/GetItem/{item.Id}" ,new 
             {
                 success = true 
-            };
+            });
             
         } catch (Exception err) 
         {
             Console.WriteLine(err.Message);
-            HttpContext.Response.StatusCode = 500;
-            return new 
-            {
-                success = false
-            };
+            return StatusCode(500, new {
+                success = false,
+                message = "Error adding item to stock"
+            });
         }
     } 
 
     [HttpGet("GetItem/{id}")]
-    public object GetItem(string id) 
+    public async Task<IActionResult> GetItem(string id) 
     {
         try 
         {
-            Item[] dbResults = _db.CurrentStock
+            Item[] dbResults = await _db.CurrentStock
                 .Where(i => Convert.ToString(i.Id) == id)
-                .ToArray();
+                .ToArrayAsync();
 
             if (dbResults.Length < 1) 
             {
                 return NotFound();
             }
 
-            return new 
+            return Ok(new 
             {
                 item = dbResults[0],
                 success = true
-            };
+            });
         } catch (Exception err) 
         {
             Console.WriteLine(err.Message);

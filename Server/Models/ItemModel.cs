@@ -3,19 +3,21 @@ namespace Server.Models;
 public class Item 
 {
 
-    public string Name { get; set; }
+    public required string Name { get; set; }
 
-    public int Stock { get; set; } 
+    public required int Stock { get; set; } 
 
-    public string Description { get; set; }
+    public required string Description { get; set; }
 
     public Guid Id { get; set; }
 
-    public float Price { get; set; }
+    public required float Price { get; set; }
 
     public DateTime Date { get; set; }
 
-    public string ImageLink { get; set; }
+    public required string ImageLink { get; set; }
+
+    public required string Category { get; set; }
 
     public Item() 
     {

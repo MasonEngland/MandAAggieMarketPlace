@@ -4,6 +4,7 @@ import { useState, useEffect } from 'react';
 import { useSearchParams } from 'react-router-dom';
 import axios from 'axios';
 import cookies from 'js-cookie';
+import verifyUser from '../util/verifyAccount';
 
 export default function Item(props) {
 
@@ -38,14 +39,8 @@ export default function Item(props) {
     },[]);
 
     const purchase = () => {
-        let token = "";
-        try {
-            token = cookies.get('token');
-        } catch (err) {
-            console.log(err);
-            return;
-        }
-        if (token === null || token === undefined || token === "") {
+        
+        if (verifyUser() === null) {
             location.href = '/login';
             return;
         }
@@ -57,9 +52,6 @@ export default function Item(props) {
             return;
         }
 
-        if (!token || token === '') {
-            location.href = '/login';
-        }
         else if (!id || id === '') {
             location.href = '/home';
         }
@@ -99,7 +91,7 @@ export default function Item(props) {
                 <div className={styles.infoContainer}>
                     <h2>{item.name}</h2>
                     <span className={styles.price}>${item.price}</span>
-                    <span>Here is just a placeholder description meant for testing how the info section looks when there is an item description. font size should be large to so that a lot of text can fill the section</span>
+                    <span>{item.description}</span>
                     <span style={item.stock < 5 ? {color: 'red'} : {color: 'black'}}>
                         Stock: {item.stock}
                         </span>

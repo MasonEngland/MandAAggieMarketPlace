@@ -1,10 +1,16 @@
 import Topbar from "../Components/topbar"
 import styles from "../css/settings.module.css"
-import {useEffect, useState} from 'react';
+import {useEffect, useState, useContext} from 'react';
+import AuthContext from "../context/authContext";
 import Cookies from 'js-cookie';
 import axios from 'axios';
+import { useNavigate } from "react-router"
 
 export default function Settings() {
+    const isLoggedIn = useContext(AuthContext);
+    const navigate = useNavigate();
+
+
     const [account, setAccount] = useState({
         firstName: "",
         lastName: "",
@@ -12,12 +18,7 @@ export default function Settings() {
     });
 
     useEffect(() => {
-        let token = Cookies.get('token');
-
-        if (token === null || token === undefined || token === "") {
-            window.location.replace("/login");
-            return;
-        }
+        let token = Cookies.get("token");
         
         axios.get("http://localhost:2501/Api/Accounts/GetAccount", {
             headers: {
@@ -28,7 +29,7 @@ export default function Settings() {
                 setAccount(res.data.account);
             }
             else {
-                alert(res.data.message);
+                navigate("/login");
             }
         }).catch(err => {
             alert(err);

@@ -6,6 +6,7 @@ using Microsoft.EntityFrameworkCore;
 using JWT.Builder;
 using JWT.Algorithms;
 using Microsoft.Net.Http.Headers;
+using System.Threading.Tasks;
 
 
 [Route("Api/Accounts")]
@@ -21,6 +22,10 @@ public class AccountsController : Controller
     // just a help function to deserialize token data
     private Account? GetAccount()
     {
+        //
+        // gets the token data from the http contex and deserializes it 
+        // returns null or the account object depending on the success of the deserialization
+        //
         string? data = Convert.ToString(HttpContext.Items["tokenData"]);
         if (data == null) 
         {
@@ -37,13 +42,15 @@ public class AccountsController : Controller
 
     // Route: /Api/Accounts/Delete/id
     [HttpDelete("Delete/{id}")]
-    public IActionResult DeleteAccount(String id) 
+    public async Task<IActionResult> DeleteAccount(String id) 
     {
         try
         {
-            Account account = _db.accounts.Where(i => Convert.ToString(i.Id) == id).ToArray()[0];
+            // get the account from the database by converting to an array and then getting the first element
+            Account account = (await _db.accounts.Where(i => Convert.ToString(i.Id) == id).ToArrayAsync())[0];
 
             _db.accounts.Remove(account);
+            await _db.SaveChangesAsync();
 
             return Ok(new {success = true});
         } catch (Exception err)
@@ -55,7 +62,7 @@ public class AccountsController : Controller
 
     // Route: /Api/Accounts/Balance/{funds}
     [HttpPut("Balance/{funds}")]
-    public IActionResult AddFunds(double funds)
+    public async Task<IActionResult> AddFunds(double funds)
     {
         Account? account = GetAccount();
         if (account == null)
@@ -68,16 +75,16 @@ public class AccountsController : Controller
             return BadRequest(new {success = false, message = "not enough funds"});
         }
 
-        _db.accounts
+        await _db.accounts
             .Where(h => h.Id == account.Id)
-            .ExecuteUpdate(setter => setter.SetProperty(b => b.Balance, b => b.Balance + funds));
+            .ExecuteUpdateAsync(setter => setter.SetProperty(b => b.Balance, b => b.Balance + funds));
 
         return Ok(new {success = true});
     }
 
     //Route: /Api/Accounts/Purchases
     [HttpGet("Purchases")]
-    public IActionResult GetPurchases() 
+    public async Task<IActionResult> GetPurchases() 
     {
         Account? account = GetAccount();
         if (account == null) 
@@ -88,7 +95,7 @@ public class AccountsController : Controller
             });
         }
 
-        var Items = _db.OrderQueue.Where(b => b.OwnerId == Convert.ToString(account.Id)).ToArray();
+        Order[] Items = await  _db.OrderQueue.Where(b => b.OwnerId == Convert.ToString(account.Id)).ToArrayAsync();
 
         if (Items.Length == 0) 
         {
@@ -119,7 +126,7 @@ public class AccountsController : Controller
 
     // Route: /Api/Accounts/Update
     [HttpPut("Update")]
-    public IActionResult UpdateAccount([FromBody] Account account)
+    public async Task<IActionResult> UpdateAccount([FromBody] Account account)
     {
         Account? currentAccount = GetAccount();
         if (currentAccount == null)
@@ -136,15 +143,15 @@ public class AccountsController : Controller
             return BadRequest(new { success = false, message = "field missing" });
         }
 
-        _db.accounts
+        await _db.accounts
             .Where(h => h.Id == account.Id)
-            .ExecuteUpdate(setter => setter
+            .ExecuteUpdateAsync(setter => setter
                 .SetProperty(b => b.FirstName, account.FirstName)
                 .SetProperty(b => b.LastName, account.LastName)
                 .SetProperty(b => b.Email, account.Email)
             );
         
-        Account[] gotAccount = _db.accounts.Where(h => h.Id == account.Id).ToArray();
+        Account[] gotAccount = await _db.accounts.Where(h => h.Id == account.Id).ToArrayAsync();
 
         string secret = Environment.GetEnvironmentVariable("ACCESS_TOKEN_SECRET")!;
         string token = JwtBuilder
@@ -153,23 +160,18 @@ public class AccountsController : Controller
             .WithSecret(secret)
             .AddClaim("Id", gotAccount[0].Id)
             .AddClaim("Email", gotAccount[0].Email)
-            .AddClaim("Password", gotAccount[0].Password)
             .AddClaim("FirstName", gotAccount[0].FirstName)
             .AddClaim("LastName", gotAccount[0].LastName)
             .AddClaim("Admin", gotAccount[0].Admin)
             .Encode();
         
         
-        // TODO: find a way to set the Set-Cookie header in response 
-        var cookie = new SetCookieHeaderValue("testCookie", "myValue");
-        cookie.Expires = DateTimeOffset.Now.AddDays(1);
-        Request.Headers.Append("Set-Cookie", cookie.ToString());
         return Ok(new { success = true, account, token });
     }
 
     // Route: /Api/Accounts/UpdatePassword
     [HttpPut("UpdatePassword")]
-    public IActionResult UpdatePassword([FromBody] Account account)
+    public async Task<IActionResult> UpdatePassword([FromBody] Account account)
     {
         Account? currentAccount = GetAccount();
         if (currentAccount == null)
@@ -184,9 +186,9 @@ public class AccountsController : Controller
 
         try
         {
-            _db.accounts
+            await _db.accounts
             .Where(h => h.Id == account.Id)
-            .ExecuteUpdate(setter => setter
+            .ExecuteUpdateAsync(setter => setter
                 .SetProperty(b => b.Password, account.Password)
             );
         } catch (Exception err)

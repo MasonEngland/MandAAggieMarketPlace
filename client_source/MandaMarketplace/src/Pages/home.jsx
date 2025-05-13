@@ -1,13 +1,12 @@
 import Topbar from '../Components/topbar';
 import styles from '../css/home.module.css';
 import Card from '../Components/Itemcard';
-import { useEffect, useState } from 'react';
+import { useEffect, useState, useContext } from 'react';
 import axios from 'axios';
 import Cookies from 'js-cookie';
-import { use } from 'react';
+import AuthContext from '../context/authContext';
 
 export default function Home() {
-
     let [cardData, setCardData] = useState([{
         imageLink: "https://www.usu.edu/advancement/named-spaces/images/oldmain.jpg",
         name: "Old Main",
@@ -35,11 +34,6 @@ export default function Home() {
                 {cardData.map((data, index) => {
                     return <Card data={data} key={index}/>
                 })}
-                <Card data={cardData[0]}/>
-                <Card data={cardData[0]}/>
-                <Card data={cardData[0]}/>  
-                <Card data={cardData[0]}/>
-                <Card data={cardData[0]}/>
             </div>
         </div>
     )

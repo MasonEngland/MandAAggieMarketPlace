@@ -4,6 +4,7 @@ using Server.Models;
 using static BCrypt.Net.BCrypt;
 using JWT.Builder;
 using JWT.Algorithms;
+using Microsoft.EntityFrameworkCore;
 
 namespace Server.Controllers;
 
@@ -18,7 +19,7 @@ public class AuthController : Controller
     }
 
     [HttpPost("Create")]
-    public object Create([FromBody] Account account)
+    public async Task<IActionResult> Create([FromBody] Account account)
     {
         string secret = Environment.GetEnvironmentVariable("ACCESS_TOKEN_SECRET")!; 
 
@@ -34,7 +35,7 @@ public class AuthController : Controller
 
         try 
         {
-             Account[] takenmail = _db.accounts
+            Account[] takenmail = _db.accounts
                 .Where(item => item.Email == account.Email).ToArray();
 
             if (takenmail.Length >= 1) 
@@ -50,8 +51,8 @@ public class AuthController : Controller
                 Balance = 0.0f,
                 Admin = false
             };
-            _db.accounts.Add(createdAccount);
-            _db.SaveChanges();
+            await _db.accounts.AddAsync(createdAccount);
+            await _db.SaveChangesAsync();
 
             var token = JwtBuilder
                 .Create()
@@ -66,13 +67,15 @@ public class AuthController : Controller
                 .Encode();
 
 
-            HttpContext.Response.StatusCode = 201;
-            return new 
+            return Created($"/Api/Accounts/{createdAccount.Id}", new 
             {
                 Success = true,
-                Account = createdAccount,
+                Id = createdAccount.Id,
+                Email = createdAccount.Email,
+                FirstName = createdAccount.FirstName,
+                LastName = createdAccount.LastName,
                 Token = token
-            };
+            });
             
         } catch (Exception err)
         {
@@ -82,7 +85,7 @@ public class AuthController : Controller
     }
 
     [HttpPost("Login")]
-    public object Login([FromBody] Account account) 
+    public async Task<IActionResult> Login([FromBody] Account account) 
     {
         /**
         * requires a full acount object be passed in the request body
@@ -98,9 +101,9 @@ public class AuthController : Controller
                 return BadRequest("body of request is invalid");
             }
 
-            Account[] gotAccount = _db.accounts
+            Account[] gotAccount = await _db.accounts
                 .Where(item => item.Email.ToLower() == account.Email.ToLower())
-                .ToArray();
+                .ToArrayAsync();
 
             if (gotAccount.Length < 1) 
             {
@@ -109,7 +112,6 @@ public class AuthController : Controller
 
             if (!Verify(account.Password, gotAccount[0].Password))
             {
-                System.Console.WriteLine(account.Password);
                 return Unauthorized("Password is incorrect");
             }
 
@@ -121,13 +123,12 @@ public class AuthController : Controller
                 .WithSecret(secret)
                 .AddClaim("Id", gotAccount[0].Id)
                 .AddClaim("Email", gotAccount[0].Email)
-                .AddClaim("Password", gotAccount[0].Password)
                 .AddClaim("FirstName", gotAccount[0].FirstName)
                 .AddClaim("LastName", gotAccount[0].LastName)
                 .AddClaim("Admin", gotAccount[0].Admin)
                 .Encode();
 
-            return new 
+            return Ok(new 
             {
                 Success = true,
                 Id = gotAccount[0].Id,
@@ -135,11 +136,11 @@ public class AuthController : Controller
                 FirstName = gotAccount[0].FirstName,
                 LastName = gotAccount[0].LastName,
                 Token = token
-            };
+            });
         } catch (Exception err)
         {
             Console.WriteLine(err.Message);
             return StatusCode(500);
         }
-    } 
+    }
 }

@@ -5,6 +5,7 @@ import Cookies from 'js-cookie';
 import axios from 'axios';
 import { useState } from 'react';
 import { useEffect } from 'react';
+import { Link } from 'react-router';
 
 export default function Topbar(props) {
     let selected = props.pageNumber;
@@ -12,12 +13,12 @@ export default function Topbar(props) {
     // initialize account section to be login and register
     const [ accountSection, setAccountSection ] = useState(
         <nav className={styles.nav}>
-            <a href="/login" className={styles.a + " " + (selected == 3 ? styles.selected : "")}>
+            <Link to="/login" className={styles.a + " " + (selected == 3 ? styles.selected : "")}>
                 <b className={styles.b}>Login</b>
-            </a>
-            <a href="/signup" className={styles.a + " " + (selected == 4 ? styles.selected : "")}>
+            </Link>
+            <Link to="/signup" className={styles.a + " " + (selected == 4 ? styles.selected : "")}>
                 <b className={styles.b}>Register</b>
-            </a>
+            </Link>
         </nav>
     );
     
@@ -32,7 +33,7 @@ export default function Topbar(props) {
             let email = response.data.account.email
             setAccountSection(
                 <nav>
-                    <a href="/settings" className={styles.a + " " + (selected == 5 ? styles.selected : "")}><b className={styles.b}>{email}</b></a>
+                    <Link to="/settings" className={styles.a + " " + (selected == 5 ? styles.selected : "")}><b className={styles.b}>{email}</b></Link>
                 </nav>
             );
         }).catch((error) => {
@@ -42,9 +43,9 @@ export default function Topbar(props) {
     
     // check if the current page is slected
     const navitems = [
-        <a href="/" className={styles.a + " " + (selected == 0 ? styles.selected : "")} key="1">Home</a>,
-        <a href="/browse" className={styles.a + " "  + (selected == 1 ? styles.selected: "")} key="2">Browse</a>,
-        <a href="/settings" className={styles.a + " " +  (selected == 2 ? styles.selected: "")} key="3">Settings</a> 
+        <Link to="/" className={styles.a + " " + (selected == 0 ? styles.selected : "")} key="1">Home</Link>,
+        <Link to="/browse" className={styles.a + " "  + (selected == 1 ? styles.selected: "")} key="2">Browse</Link>,
+        <Link to="/settings" className={styles.a + " " +  (selected == 2 ? styles.selected: "")} key="3">Settings</Link> 
     ];
 
     return (

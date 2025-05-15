@@ -7,9 +7,7 @@ import axios from 'axios';
 import { useNavigate } from "react-router"
 
 export default function Settings() {
-    const isLoggedIn = useContext(AuthContext);
-    const navigate = useNavigate();
-
+    const user = useContext(AuthContext);
 
     const [account, setAccount] = useState({
         firstName: "",
@@ -18,23 +16,12 @@ export default function Settings() {
     });
 
     useEffect(() => {
-        let token = Cookies.get("token");
-        
-        axios.get("http://localhost:2501/Api/Accounts/GetAccount", {
-            headers: {
-                Authorization: `Bearer ${token}`
-            }
-        }).then(res => {
-            if (res.data.success === true) {
-                setAccount(res.data.account);
-            }
-            else {
-                navigate("/login");
-            }
-        }).catch(err => {
-            alert(err);
+        setAccount({
+            firstName: user.firstName,
+            lastName: user.lastName,
+            email: user.email,
+            balance: user.balance
         });
-        console.log(account);
     }, [])
 
 

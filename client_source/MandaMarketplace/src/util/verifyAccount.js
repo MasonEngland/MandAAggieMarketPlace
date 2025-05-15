@@ -2,27 +2,26 @@ import axios from 'axios';
 import Cookies from 'js-cookie';
 
 // function that verifies user through server and reeturns the user object
-export default function verifyAccount() {
+export default async function verifyAccount() {
     let cookie = Cookies.get("token");
+
+    const def = {authenticated: false};
     
     if (cookie == null || cookie === undefined || cookie === "") {
-        return null;
+        return def;
     }
     const headers = {
         'Authorization': `Bearer ${cookie}`,
         'content-type': 'application/json'
     }
-    axios.get("http://localhost:2501/Api/Accounts/GetAccount", {
+    const res = await axios.get("http://localhost:2501/Api/Accounts/GetAccount", {
         headers: headers
-    }).then(res => {
-        if (res.data.success === true) {
-            return res.data.account;
-        }
-        else {
-            return null;
-        }
-    }).catch(err => {
-        console.log(err);
-        return null;
     });
+    if (res.data.success === true) {
+        console.log(res.data.account);
+        return {...res.data.account, authenticated: true};
+    }
+    else {
+        return def;
+    }
 }

@@ -1,9 +1,11 @@
 import styles from '../css/itemcard.module.css';
+import { useNavigate } from 'react-router';
 
 export default function Itemcard(props) {
+    const navigate = useNavigate();
     
     const clickHandler = () => {
-        location.href = `/item?item=${props.data.id}`;
+        navigate(`/item?item=${props.data.id}`);
     }
 
     return (

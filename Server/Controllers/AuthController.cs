@@ -1,10 +1,11 @@
 using Microsoft.AspNetCore.Mvc;
 using Server.Context;
 using Server.Models;
-using static BCrypt.Net.BCrypt;
 using JWT.Builder;
 using JWT.Algorithms;
 using Microsoft.EntityFrameworkCore;
+using static BCrypt.Net.BCrypt;
+using static Server.Util.AccountUtilities;
 
 namespace Server.Controllers;
 
@@ -54,17 +55,7 @@ public class AuthController : Controller
             await _db.accounts.AddAsync(createdAccount);
             await _db.SaveChangesAsync();
 
-            var token = JwtBuilder
-                .Create()
-                .WithAlgorithm(new HMACSHA256Algorithm())
-                .WithSecret(secret)
-                .AddClaim("Id", createdAccount.Id)
-                .AddClaim("Email", createdAccount.Email)
-                .AddClaim("Password", createdAccount.Password)
-                .AddClaim("FirstName", createdAccount.FirstName)
-                .AddClaim("LastName", createdAccount.LastName)
-                .AddClaim("Admin", createdAccount.Admin)
-                .Encode();
+            var token = MakeToken(createdAccount);
 
 
             return Created($"/Api/Accounts/{createdAccount.Id}", new 
@@ -115,20 +106,9 @@ public class AuthController : Controller
                 return Unauthorized("Password is incorrect");
             }
 
-            // TODO: make a secure way to obtain admin privilage
+            var token = MakeToken(gotAccount[0]);
 
-            var token = JwtBuilder
-                .Create()
-                .WithAlgorithm(new HMACSHA256Algorithm())
-                .WithSecret(secret)
-                .AddClaim("Id", gotAccount[0].Id)
-                .AddClaim("Email", gotAccount[0].Email)
-                .AddClaim("FirstName", gotAccount[0].FirstName)
-                .AddClaim("LastName", gotAccount[0].LastName)
-                .AddClaim("Admin", gotAccount[0].Admin)
-                .Encode();
-
-            return Ok(new 
+            return Ok(new
             {
                 Success = true,
                 Id = gotAccount[0].Id,

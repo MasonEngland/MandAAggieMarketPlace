@@ -18,7 +18,7 @@ export default async function verifyAccount() {
         headers: headers
     });
     if (res.data.success === true) {
-        console.log(res.data.account);
+        //console.log(res.data.account);
         return {...res.data.account, authenticated: true};
     }
     else {

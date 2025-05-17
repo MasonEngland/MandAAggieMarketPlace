@@ -1,12 +1,11 @@
 using Server.Models;
 using Server.Context;
 using Microsoft.AspNetCore.Mvc;
-using System.Text.Json;
 using Microsoft.EntityFrameworkCore;
 using JWT.Builder;
 using JWT.Algorithms;
-using Microsoft.Net.Http.Headers;
-using System.Threading.Tasks;
+using static Server.Util.AccountUtilities;
+
 
 
 [Route("Api/Accounts")]
@@ -17,27 +16,6 @@ public class AccountsController : Controller
     public AccountsController(DatabaseContext db)
     {
         _db = db;
-    }
-
-    // just a help function to deserialize token data
-    private Account? GetAccount()
-    {
-        //
-        // gets the token data from the http contex and deserializes it 
-        // returns null or the account object depending on the success of the deserialization
-        //
-        string? data = Convert.ToString(HttpContext.Items["tokenData"]);
-        if (data == null) 
-        {
-            return null; 
-        }
-
-        Account? account = JsonSerializer.Deserialize<Account>(data!);
-        if (account == null)
-        {
-            return null;
-        }
-        return account; 
     }
 
     // Route: /Api/Accounts/Delete/id
@@ -64,7 +42,7 @@ public class AccountsController : Controller
     [HttpPut("Balance/{funds}")]
     public async Task<IActionResult> AddFunds(double funds)
     {
-        Account? account = GetAccount();
+        Account? account = GetAccount(HttpContext);
         if (account == null)
         {
             return Unauthorized(new { success = false });
@@ -86,7 +64,7 @@ public class AccountsController : Controller
     [HttpGet("Purchases")]
     public async Task<IActionResult> GetPurchases() 
     {
-        Account? account = GetAccount();
+        Account? account = GetAccount(HttpContext);
         if (account == null) 
         {
             return Unauthorized(new {
@@ -112,15 +90,19 @@ public class AccountsController : Controller
     }
 
     [HttpGet("GetAccount")]
-    public IActionResult GetOneAccount()
+    public async Task<IActionResult> GetOneAccount()
     {
-        Account? account = GetAccount();
-        if (account == null)
+        Account? accountFromToken = GetAccount(HttpContext);
+        if (accountFromToken == null)
         {
             return Unauthorized(new { success = false });
         }
 
+        Account account = (await _db.accounts
+            .Where(h => h.Id == accountFromToken.Id)
+            .ToArrayAsync())[0];
 
+        Console.WriteLine(account.Balance);
         return Ok(new { success = true, account = account });
     }
 
@@ -128,7 +110,7 @@ public class AccountsController : Controller
     [HttpPut("Update")]
     public async Task<IActionResult> UpdateAccount([FromBody] Account account)
     {
-        Account? currentAccount = GetAccount();
+        Account? currentAccount = GetAccount(HttpContext);
         if (currentAccount == null)
         {
             return Unauthorized(new { success = false });
@@ -154,17 +136,7 @@ public class AccountsController : Controller
         Account[] gotAccount = await _db.accounts.Where(h => h.Id == account.Id).ToArrayAsync();
 
         string secret = Environment.GetEnvironmentVariable("ACCESS_TOKEN_SECRET")!;
-        string token = JwtBuilder
-            .Create()
-            .WithAlgorithm(new HMACSHA256Algorithm())
-            .WithSecret(secret)
-            .AddClaim("Id", gotAccount[0].Id)
-            .AddClaim("Email", gotAccount[0].Email)
-            .AddClaim("FirstName", gotAccount[0].FirstName)
-            .AddClaim("LastName", gotAccount[0].LastName)
-            .AddClaim("Admin", gotAccount[0].Admin)
-            .Encode();
-        
+        string token = MakeToken(gotAccount[0])!;
         
         return Ok(new { success = true, account, token });
     }
@@ -173,7 +145,7 @@ public class AccountsController : Controller
     [HttpPut("UpdatePassword")]
     public async Task<IActionResult> UpdatePassword([FromBody] Account account)
     {
-        Account? currentAccount = GetAccount();
+        Account? currentAccount = GetAccount(HttpContext);
         if (currentAccount == null)
         {
             return Unauthorized(new { success = false });

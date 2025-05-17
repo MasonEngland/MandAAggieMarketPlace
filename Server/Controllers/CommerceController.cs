@@ -3,6 +3,7 @@ using Microsoft.AspNetCore.Mvc;
 using Server.Context;
 using Server.Models;
 using Microsoft.EntityFrameworkCore;
+using static Server.Util.AccountUtilities;
 
 namespace Server.Controllers;
 
@@ -18,21 +19,7 @@ public class CommerceController : Controller
     }
 
     // Helper function for deserializing the account info from token data  
-    private Account? GetAccount()
-    {
-        string? data = Convert.ToString(HttpContext.Items["tokenData"]);
-        if (data == null) 
-        {
-            return null; 
-        }
-
-        Account? account = JsonSerializer.Deserialize<Account>(data!);
-        if (account == null)
-        {
-            return null;
-        }
-        return account; 
-    }
+    
 
     [HttpGet("GetStock/{queries}")]
     public object GetStock(int queries) 
@@ -78,7 +65,7 @@ public class CommerceController : Controller
          *
          */
 
-        Account? account = GetAccount();
+        Account? account = GetAccount(HttpContext);
         if (account == null)    
         {
             return Redirect("/login");
@@ -95,8 +82,9 @@ public class CommerceController : Controller
 
         try 
         {
-            Item[] dbItem = _db.CurrentStock.Where(h => h.Id == item.Id).ToArray(); 
-            if (dbItem.Length < 1) 
+            IQueryable<Item> dbItemquery = _db.CurrentStock.Where(h => h.Id == item.Id); 
+            Item[] dbItem = await dbItemquery.ToArrayAsync();
+            if (dbItem.Length < 1)
             {
                 return NotFound("Item search failed");
             } 
@@ -112,18 +100,17 @@ public class CommerceController : Controller
             }
 
             // lower the item stock by the amount requested
-            await _db.CurrentStock
-                .Where(h => h.Id == item.Id)
+            await dbItemquery
                 .ExecuteUpdateAsync(setter => setter.SetProperty(b => b.Stock, b => b.Stock - item.Stock));
 
             // remove the money from the clients account to pay for the product 
             await _db.accounts
-                .Where(item => item.Id == account.Id)
+                .Where(h => h.Id == account.Id)
                 .ExecuteUpdateAsync(setter => setter.SetProperty(b => b.Balance, account.Balance - item.Price));
 
             
             _db.OrderQueue.Add(new Order() {
-                OrderItem = item,
+                OrderItem = dbItem[0],
                 OwnerId = Convert.ToString(account.Id)!, 
                 Adress = address
             });

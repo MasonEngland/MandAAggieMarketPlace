@@ -1,7 +1,7 @@
 import Topbar from '../Components/topbar';
 import styles from '../css/item.module.css';
 import { useState, useEffect } from 'react';
-import { useSearchParams } from 'react-router-dom';
+import { useSearchParams, useNavigate } from 'react-router';
 import axios from 'axios';
 import cookies from 'js-cookie';
 import verifyUser from '../util/verifyAccount';
@@ -13,6 +13,7 @@ export default function Item(props) {
     const [searchParams] = useSearchParams();
     const [quantity, setQuantity] = useState(0);
     const [address, setAddress] = useState('');
+    const navigate = useNavigate();
 
 
     // fetch item data from server
@@ -20,7 +21,7 @@ export default function Item(props) {
         const id = searchParams.get('item');
 
         if (!id || id === '') {
-            location.href = '/home';
+            navigate('/');
         }
 
         axios.get(`http://localhost:2501/Api/Commerce/GetItem/${id}`)
@@ -34,14 +35,22 @@ export default function Item(props) {
         })
         .catch(err => {
             alert(err);
-            location.replace("/");
+            navigate("/");
         });
     },[]);
 
     const purchase = () => {
         
+
+
         if (verifyUser() === null) {
-            location.href = '/login';
+            navigate('/login', {replace: true});
+            return;
+        }
+
+        const token = cookies.get('token');
+        if (token === null || token === undefined || token === '') {
+            navigate('/login', {replace: true});
             return;
         }
 
@@ -69,7 +78,7 @@ export default function Item(props) {
             if (res.data.success === true) {
                 console.log(res);
                 alert(res.data.message);
-                location.href = '/';
+                navigate('/');
             }
             else {
                 alert(res.data.message);
@@ -98,7 +107,7 @@ export default function Item(props) {
                     <span>Recieve within 10 days</span>
                     <span className={styles.inputContainer}>
                         <input type="number" placeholder="Quantity" className={styles.input} onChange={(e) => setQuantity(e.target.value)}/>
-                        <input type="text" placeholder="Address" className={styles.input} onChange={(e) => setAddress(e.target.value)}/>
+                        <input type="text" placeholder="Address" className={styles.input} value={address} onChange={(e) => setAddress(e.target.value)}/>
                     </span>
                     <button className={styles.button} style={{cursor: 'pointer'}} onClick={() => purchase()}>Purchase</button>
                 </div>

@@ -1,10 +1,10 @@
 import Topbar from '../Components/topbar';
 import styles from '../css/item.module.css';
-import { useState, useEffect } from 'react';
+import { useState, useEffect, useContext } from 'react';
 import { useSearchParams, useNavigate } from 'react-router';
 import axios from 'axios';
 import cookies from 'js-cookie';
-import verifyUser from '../util/verifyAccount';
+import AuthContext from '../context/authContext';
 
 export default function Item(props) {
 
@@ -14,6 +14,7 @@ export default function Item(props) {
     const [quantity, setQuantity] = useState(0);
     const [address, setAddress] = useState('');
     const navigate = useNavigate();
+    const user = useContext(AuthContext);
 
 
     // fetch item data from server
@@ -41,9 +42,7 @@ export default function Item(props) {
 
     const purchase = () => {
         
-
-
-        if (verifyUser() === null) {
+        if (!user.authenticated) {
             navigate('/login', {replace: true});
             return;
         }

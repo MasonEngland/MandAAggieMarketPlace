@@ -2,24 +2,25 @@ using Server.Models;
 using Server.Context;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.EntityFrameworkCore;
-using JWT.Builder;
-using JWT.Algorithms;
+using Server.Services;
 using static Server.Util.AccountUtilities;
 
 
-
+[ApiController]
 [Route("Api/Accounts")]
 public class AccountsController : Controller
 {
     private DatabaseContext _db;
+    private IAccountService _accountService;
 
-    public AccountsController(DatabaseContext db)
+    public AccountsController(DatabaseContext db, IAccountService accountService)
     {
+        _accountService = accountService;
         _db = db;
     }
 
     // Route: /Api/Accounts/Delete/id
-    [HttpDelete("Delete/{id}")]
+    [HttpDelete("{id}")]
     public async Task<IActionResult> DeleteAccount(String id) 
     {
         try
@@ -53,11 +54,14 @@ public class AccountsController : Controller
             return BadRequest(new {success = false, message = "not enough funds"});
         }
 
-        await _db.accounts
-            .Where(h => h.Id == account.Id)
-            .ExecuteUpdateAsync(setter => setter.SetProperty(b => b.Balance, b => b.Balance + funds));
+        bool result = await _accountService.AddFunds(Convert.ToString(account.Id)!, funds);
+        if (!result)
+        {
+            return NotFound(new { success = false });
+        }
+        
 
-        return Ok(new {success = true});
+        return Ok(new { success = true });
     }
 
     //Route: /Api/Accounts/Purchases
@@ -73,13 +77,12 @@ public class AccountsController : Controller
             });
         }
 
-        Order[] Items = await  _db.OrderQueue.Where(b => b.OwnerId == Convert.ToString(account.Id)).ToArrayAsync();
-
-        if (Items.Length == 0) 
+        Order[]? Items = await _accountService.GetPurchases(Convert.ToString(account.Id)!);
+        if (Items == null) 
         {
-            return Ok(new {
-                success = true,
-                messgae = "no items to be found"
+            return NotFound(new {
+                success = false,
+                message = "No purchases found"
             });
         }
 
@@ -98,11 +101,13 @@ public class AccountsController : Controller
             return Unauthorized(new { success = false });
         }
 
-        Account account = (await _db.accounts
-            .Where(h => h.Id == accountFromToken.Id)
-            .ToArrayAsync())[0];
+        Account? account = await _accountService.GetAccount(Convert.ToString(accountFromToken.Id)!);
+        if (account == null)
+        {
+            return NotFound(new { success = false });
+        }
 
-        Console.WriteLine(account.Balance);
+
         return Ok(new { success = true, account = account });
     }
 
@@ -125,18 +130,14 @@ public class AccountsController : Controller
             return BadRequest(new { success = false, message = "field missing" });
         }
 
-        await _db.accounts
-            .Where(h => h.Id == account.Id)
-            .ExecuteUpdateAsync(setter => setter
-                .SetProperty(b => b.FirstName, account.FirstName)
-                .SetProperty(b => b.LastName, account.LastName)
-                .SetProperty(b => b.Email, account.Email)
-            );
-        
-        Account[] gotAccount = await _db.accounts.Where(h => h.Id == account.Id).ToArrayAsync();
+        Account? updatedAccount = await _accountService.UpdateAccount(account);
+        if (updatedAccount == null)
+        {
+            return NotFound(new { success = false });
+        }
 
         string secret = Environment.GetEnvironmentVariable("ACCESS_TOKEN_SECRET")!;
-        string token = MakeToken(gotAccount[0])!;
+        string token = MakeToken(updatedAccount)!;
         
         return Ok(new { success = true, account, token });
     }
@@ -156,18 +157,7 @@ public class AccountsController : Controller
             return Unauthorized(new { success = false });
         }
 
-        try
-        {
-            await _db.accounts
-            .Where(h => h.Id == account.Id)
-            .ExecuteUpdateAsync(setter => setter
-                .SetProperty(b => b.Password, account.Password)
-            );
-        } catch (Exception err)
-        {
-            Console.WriteLine(err.Message);
-            return StatusCode(500);
-        }
+        bool result = await _accountService.ChangePassword(Convert.ToString(account.Id)!, account.Password);
 
         return Ok(new { success = true });
     }

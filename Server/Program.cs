@@ -1,6 +1,7 @@
 using Server.Context;
 using Microsoft.EntityFrameworkCore;
 using Server.Middleware;
+using Server.Services;
 
 namespace Server;
 
@@ -15,6 +16,7 @@ public class Program
 
         builder.Services.AddControllers();
         builder.Services.AddTransient<AuthToken>();
+        builder.Services.AddScoped<ICommerceService, CommerceService>();
         // Learn more about configuring Swagger/OpenAPI at https://aka.ms/aspnetcore/swashbuckle 
 
         builder.Services.AddEndpointsApiExplorer(); 

@@ -66,7 +66,7 @@ export default function Item(props) {
 
         item.stock = quantity;
 
-        axios.post(`http://localhost:2501/Api/Commerce/Purchase/${id}`, {
+        axios.post(`http://localhost:2501/Api/Commerce/Purchase/${address}`, {
             ...item
         }, {
             headers: {

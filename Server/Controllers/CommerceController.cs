@@ -3,7 +3,9 @@ using Microsoft.AspNetCore.Mvc;
 using Server.Context;
 using Server.Models;
 using Microsoft.EntityFrameworkCore;
+using Server.Services;
 using static Server.Util.AccountUtilities;
+using Microsoft.Extensions.ObjectPool;
 
 namespace Server.Controllers;
 
@@ -12,11 +14,15 @@ namespace Server.Controllers;
 public class CommerceController : Controller
 {
     private readonly DatabaseContext _db;
+    private readonly ICommerceService _commerceService;
 
-    public CommerceController(DatabaseContext db) 
+
+    public CommerceController(DatabaseContext db, ICommerceService commerceService)
     {
         _db = db;
+        _commerceService = commerceService;
     }
+    
 
     // Helper function for deserializing the account info from token data  
     
@@ -71,66 +77,28 @@ public class CommerceController : Controller
             return Redirect("/login");
         }
 
-        if (account.Balance - item.Price < 0)
+        (bool Success, Item? dbItem) result = await _commerceService.Purchase(account, item, address);
+
+        if (!result.Success || result.dbItem == null) 
         {
-            return Unauthorized(new 
+            return BadRequest(new 
             {
                 success = false,
-                message = "Not enough funds"
+                message = "failed to purchase item"
             });
         }
 
-        try 
+        
+        //return a reciet noting the tansaction details
+        return Ok(new
         {
-            IQueryable<Item> dbItemquery = _db.CurrentStock.Where(h => h.Id == item.Id); 
-            Item[] dbItem = await dbItemquery.ToArrayAsync();
-            if (dbItem.Length < 1)
-            {
-                return NotFound("Item search failed");
-            } 
-
-            if (item.Stock > dbItem[0].Stock || item.Stock == 0)
-            {
-                //HttpContext.Response.StatusCode = 400;
-                return BadRequest(new 
-                {
-                    success = false,
-                    message = "Not enough items in stock"
-                });
-            }
-
-            // lower the item stock by the amount requested
-            await dbItemquery
-                .ExecuteUpdateAsync(setter => setter.SetProperty(b => b.Stock, b => b.Stock - item.Stock));
-
-            // remove the money from the clients account to pay for the product 
-            await _db.accounts
-                .Where(h => h.Id == account.Id)
-                .ExecuteUpdateAsync(setter => setter.SetProperty(b => b.Balance, account.Balance - item.Price));
-
-            
-            _db.OrderQueue.Add(new Order() {
-                OrderItem = dbItem[0],
-                OwnerId = Convert.ToString(account.Id)!, 
-                Adress = address
-            });
-            await _db.SaveChangesAsync();
-
-            
-            //return a reciet noting the tansaction details
-            return Ok(new 
-            {
-                orderedItem = dbItem[0],
-                addressTo = address,
-                cost = -dbItem[0].Price,
-                success = true,
-                message = "purchase successful"
-            });
-        } catch (Exception err) 
-        {
-            System.Console.WriteLine(err.Message);
-            return StatusCode(500);
-        }
+            orderedItem = result.dbItem,
+            addressTo = address,
+            cost = result.dbItem.Price,
+            success = true,
+            message = "purchase successful"
+        });
+        
     }
 
     [HttpPost("Restock")]
@@ -145,37 +113,19 @@ public class CommerceController : Controller
              *
              * adds as many items as the value of Item.stock in the request body 
              */
-
-            // TODO: add a good admin check and remove the comment below
-            // Account account = GetAccount()!;
-            // if (account == null || !account.Admin) 
-            // {
-            //     return Redirect("/login");
-            // }
-            
-            
-            Item[] dbResults = await _db.CurrentStock
-                .Where(i => i.Id == item.Id || i.Name == item.Name)
-                .ToArrayAsync();
-
-            if (dbResults.Length >= 1)
+            bool result = await _commerceService.AddItem(item);
+            if (!result) 
             {
-                await _db.CurrentStock
-                .Where(h => h.Id == item.Id || h.Name == item.Name)
-                .ExecuteUpdateAsync(setter => setter.SetProperty(b => b.Stock, b => b.Stock + item.Stock));
-
-                return Ok(new 
+                return BadRequest(new 
                 {
-                    success = true
+                    success = false,
+                    message = "failed to add item to stock"
                 });
             }
 
-            _db.CurrentStock.Add(item);
-            await _db.SaveChangesAsync();
-
-            return Created($"/Api/Commerce/GetItem/{item.Id}" ,new 
+            return Created($"/Api/Commerce/GetItem/{item.Id}", new
             {
-                success = true 
+                success = true
             });
             
         } catch (Exception err) 
@@ -191,26 +141,21 @@ public class CommerceController : Controller
     [HttpGet("GetItem/{id}")]
     public async Task<IActionResult> GetItem(string id) 
     {
-        try 
+        Item? item = await _commerceService.GetItem(id);
+        if (item == null) 
         {
-            Item[] dbResults = await _db.CurrentStock
-                .Where(i => Convert.ToString(i.Id) == id)
-                .ToArrayAsync();
-
-            if (dbResults.Length < 1) 
+            return NotFound(new 
             {
-                return NotFound();
-            }
-
-            return Ok(new 
-            {
-                item = dbResults[0],
-                success = true
+                success = false,
+                message = "item not found"
             });
-        } catch (Exception err) 
-        {
-            Console.WriteLine(err.Message);
-            return StatusCode(500);
         }
+
+        return Ok(new
+        {
+            item,
+            success = true
+        });
+        
     }
 }

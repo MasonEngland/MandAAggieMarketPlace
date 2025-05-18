@@ -27,7 +27,7 @@ public static class AccountUtilities
         return account;
     }
 
-    public static string? MakeToken(Account account)
+    public static string MakeToken(Account account)
     {
         string secret = Environment.GetEnvironmentVariable("ACCESS_TOKEN_SECRET")!;
         string token = JwtBuilder

@@ -1,8 +1,7 @@
 using Microsoft.AspNetCore.Mvc;
 using Server.Context;
 using Server.Models;
-using JWT.Builder;
-using JWT.Algorithms;
+using Server.Services;
 using Microsoft.EntityFrameworkCore;
 using static BCrypt.Net.BCrypt;
 using static Server.Util.AccountUtilities;
@@ -14,17 +13,15 @@ namespace Server.Controllers;
 public class AuthController : Controller
 {
     private readonly DatabaseContext _db;
-    public AuthController(DatabaseContext db) 
+    private readonly IAuthService _authService;
+    public AuthController(DatabaseContext db, IAuthService authService)
     {
         _db = db;
+        _authService = authService;
     }
-
     [HttpPost("Create")]
     public async Task<IActionResult> Create([FromBody] Account account)
     {
-        string secret = Environment.GetEnvironmentVariable("ACCESS_TOKEN_SECRET")!; 
-
-
         if (account.Email == null || 
             account.Password == null || 
             account.FirstName == null || 
@@ -34,45 +31,24 @@ public class AuthController : Controller
             return BadRequest("body of request is invalid");
         }
 
-        try 
+        Account? createdAccount = await _authService.CreateUser(account);
+        if (createdAccount == null) 
         {
-            Account[] takenmail = _db.accounts
-                .Where(item => item.Email == account.Email).ToArray();
-
-            if (takenmail.Length >= 1) 
-            {
-                return BadRequest("Email already taken");
-            }
-
-            Account createdAccount = new Account() {
-                FirstName = account.FirstName,
-                LastName = account.LastName,
-                Email = account.Email,
-                Password = HashPassword(account.Password),
-                Balance = 0.0f,
-                Admin = false
-            };
-            await _db.accounts.AddAsync(createdAccount);
-            await _db.SaveChangesAsync();
-
-            var token = MakeToken(createdAccount);
-
-
-            return Created($"/Api/Accounts/{createdAccount.Id}", new 
-            {
-                Success = true,
-                Id = createdAccount.Id,
-                Email = createdAccount.Email,
-                FirstName = createdAccount.FirstName,
-                LastName = createdAccount.LastName,
-                Token = token
-            });
-            
-        } catch (Exception err)
-        {
-            Console.WriteLine(err.Message);
-            return StatusCode(500);
+            return BadRequest("account with that email already exists");
         }
+
+        string token = MakeToken(createdAccount)!;
+
+
+        return Created($"/Api/Accounts/{createdAccount.Id}", new
+        {
+            Success = true,
+            Id = createdAccount.Id,
+            Email = createdAccount.Email,
+            FirstName = createdAccount.FirstName,
+            LastName = createdAccount.LastName,
+            Token = token
+        });
     }
 
     [HttpPost("Login")]

@@ -7,18 +7,49 @@ import Cookies from 'js-cookie';
 import AuthContext from '../context/authContext';
 
 export default function Home() {
-    let [cardData, setCardData] = useState([{
+    const [cardData, setCardData] = useState([{
         imageLink: "https://www.usu.edu/advancement/named-spaces/images/oldmain.jpg",
         name: "Old Main",
         stock: 10,
         price: 10.00,
     }]);
 
+    const [clothing, setClothing] = useState([]);
+    const [gaming, setGaming] = useState([]);
+
     useEffect(() => {
+        const token = Cookies.get('token');
+
         axios.get("http://localhost:2501/Api/Commerce/GetStock/1")
         .then((response) => {
-            console.log(response.data);
             setCardData(response.data.stock);
+        })
+        .catch((error) => {
+            console.log(error);
+        });
+
+        axios.get("http://localhost:2501/Api/Commerce/Search/cloth",
+        {
+            headers: {
+                'Authorization': `Bearer ${token}`,
+            }
+        }
+        ).then((response) => {
+            setClothing(response.data.items);
+        })
+        .catch((error) => {
+            console.log(error);
+        });
+
+        axios.get("http://localhost:2501/Api/Commerce/Search/gam",
+        {
+            headers: {
+                'Authorization': `Bearer ${token}`,
+            }
+        }
+        ).then((response) => {
+            console.log(response.data);
+            setGaming(response.data.items);
         })
         .catch((error) => {
             console.log(error);
@@ -32,6 +63,18 @@ export default function Home() {
             <h1>Featured</h1>
             <div className={styles.cardContainer}>
                 {cardData.map((data, index) => {
+                    return <Card data={data} key={index}/>
+                })}
+            </div>
+            <h1>Clothing</h1>
+            <div className={styles.cardContainer}>
+                {clothing.map((data, index) => {
+                    return <Card data={data} key={index}/>
+                })}
+            </div>
+            <h1>Gaming</h1>
+            <div className={styles.cardContainer}>
+                {gaming.map((data, index) => {
                     return <Card data={data} key={index}/>
                 })}
             </div>

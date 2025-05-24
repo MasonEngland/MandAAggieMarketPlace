@@ -17,6 +17,8 @@ public class Program
         builder.Services.AddControllers();
         builder.Services.AddTransient<AuthToken>();
         builder.Services.AddScoped<ICommerceService, CommerceService>();
+        builder.Services.AddScoped<IAuthService, AuthService>();
+        builder.Services.AddScoped<IAccountService, AccountService>();
         // Learn more about configuring Swagger/OpenAPI at https://aka.ms/aspnetcore/swashbuckle 
 
         builder.Services.AddEndpointsApiExplorer(); 
@@ -27,7 +29,7 @@ public class Program
 
         var app = builder.Build();
 
-        //TODO: remove during deployment
+        //! remove during deployment
         app.UseCors(builder => {
             builder.WithOrigins("http://localhost:5173");
             builder.AllowAnyMethod();

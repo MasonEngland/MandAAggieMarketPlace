@@ -101,6 +101,41 @@ public class CommerceController : Controller
         
     }
 
+    [HttpGet("Search/{searchTerm}")]
+    public async Task<IActionResult> SearchItems(string searchTerm)
+    {
+        /*
+         * this will return all the items that match the search term
+         * if no items match then it will return an empty array
+         * 
+         * @param searchTerm - String
+         * the term to search for in the item name or description
+         * 
+         * @param page - int
+         * the page number to return, defaults to 1
+         * 
+         * @param pageSize - int
+         * the number of items to return per page, defaults to 10
+         */
+        try 
+        {
+            Item[] items = await _commerceService.GetItemsBySearch(searchTerm);
+            return Ok(new 
+            {
+                items,
+                success = true
+            });
+        } catch (Exception err)
+        {
+            Console.WriteLine(err.Message);
+            return StatusCode(500, new
+            {
+                success = false,
+                message = "Error searching for items"
+            });
+        }
+    }
+
     [HttpPost("Restock")]
     public async Task<IActionResult> AddToCurrentStock([FromBody] Item item)
     {

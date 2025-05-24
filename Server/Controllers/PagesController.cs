@@ -2,7 +2,7 @@ using Microsoft.AspNetCore.Mvc;
 
 [ApiController]
 [Route("/")]
-public class PagesController : Controller 
+public class PagesController : Controller
 {
     /**
      *
@@ -34,5 +34,11 @@ public class PagesController : Controller
     public IActionResult Settings()
     {
         return File("index.html", "text/html");
+    }
+
+    [HttpGet("home")]
+    public IActionResult HomePage()
+    {
+        return Redirect("/");
     }
 }

@@ -41,7 +41,8 @@ export default function Item(props) {
     },[]);
 
     const purchase = () => {
-        
+
+        // check user authentication and token validity
         if (!user.authenticated) {
             navigate('/login', {replace: true});
             return;
@@ -53,6 +54,7 @@ export default function Item(props) {
             return;
         }
 
+        //validate item
         const id = item.id;
 
         if (address === '' || quantity === 0) {
@@ -61,11 +63,13 @@ export default function Item(props) {
         }
 
         else if (!id || id === '') {
-            location.href = '/home';
+            location.href = '/';
         }
 
         item.stock = quantity;
 
+
+        // make request to database
         axios.post(`http://localhost:2501/Api/Commerce/Purchase/${address}`, {
             ...item
         }, {
@@ -77,7 +81,7 @@ export default function Item(props) {
             if (res.data.success === true) {
                 console.log(res);
                 alert(res.data.message);
-                navigate('/');
+                location.href = '/';
             }
             else {
                 alert(res.data.message);

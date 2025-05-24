@@ -15,6 +15,11 @@ public class AccountsController : Controller
 
     public AccountsController(DatabaseContext db, IAccountService accountService)
     {
+        /*
+         * this constructor is used to inject the database context and the account service into the controller
+         * this allows us to use the database context and the account service in the controller methods
+         * the account service will contain all the business logic and the controller endpoints will only validate input and return the result
+         */
         _accountService = accountService;
         _db = db;
     }

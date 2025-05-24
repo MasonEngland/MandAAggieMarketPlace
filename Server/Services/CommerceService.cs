@@ -74,7 +74,7 @@ public class CommerceService : ICommerceService
         {
             return (false, null);
         }
-        
+
         if (item.Stock > dbItem.Stock || item.Stock == 0)
         {
             return (false, null);
@@ -82,7 +82,7 @@ public class CommerceService : ICommerceService
 
         // lower the item stock by the amount requested
         dbItem.Stock -= item.Stock;
-        
+
         await _db.accounts.Where(h => h.Id == account.Id)
             .ExecuteUpdateAsync(setter => setter.SetProperty(b => b.Balance, b => b.Balance - item.Price * item.Stock));
 
@@ -94,7 +94,24 @@ public class CommerceService : ICommerceService
             Adress = address
         });
         await _db.SaveChangesAsync();
-        
+
         return (true, dbItem);
+    }
+    
+    public async Task<Item[]> GetItemsBySearch(string searchTerm, int page = 1, int pageSize = 10)
+    {
+        try
+        {
+            return await _db.CurrentStock
+                .Where(i => i.Name.Contains(searchTerm) || i.Description.Contains(searchTerm) || i.Category.Contains(searchTerm))
+                .Skip((page - 1) * pageSize)
+                .Take(pageSize)
+                .ToArrayAsync();
+        }
+        catch (Exception err)
+        {
+            Console.WriteLine(err.Message);
+            return Array.Empty<Item>();
+        }
     }
 }

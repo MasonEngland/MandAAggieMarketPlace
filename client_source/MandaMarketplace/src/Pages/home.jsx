@@ -35,7 +35,7 @@ export default function Home() {
             }
         }
         ).then((response) => {
-            setClothing(response.data.items);
+            setClothing(response.data.stock);
         })
         .catch((error) => {
             console.log(error);
@@ -49,7 +49,7 @@ export default function Home() {
         }
         ).then((response) => {
             console.log(response.data);
-            setGaming(response.data.items);
+            setGaming(response.data.stock);
         })
         .catch((error) => {
             console.log(error);

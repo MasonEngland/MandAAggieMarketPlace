@@ -1,14 +1,15 @@
-import React from 'react';
 import styles from '../css/topbar.module.css';
 import USU_logo from '../assets/USU_logo.jpg';
 import Cookies from 'js-cookie';
 import axios from 'axios';
 import { useState } from 'react';
 import { useEffect } from 'react';
-import { Link } from 'react-router';
+import { Link, useNavigate } from 'react-router';
 
 export default function Topbar(props) {
     let selected = props.pageNumber;
+    const [ search, setSearch ] = useState("");
+    const navigate = useNavigate();
 
     // initialize account section to be login and register
     const [ accountSection, setAccountSection ] = useState(
@@ -54,8 +55,19 @@ export default function Topbar(props) {
                 <img id="logo" src={USU_logo} alt="USU Logo" className={styles.img} />
                 <span className={styles.span} id ="title">MandA Aggie Marketplace</span>
                 {navitems}
-                <input type="text" placeholder="Search" className={styles.input}/>
-                <button type="button" className={styles.button}><span id="material-symbols-outlined" className={styles.button + styles.materialSymbolsOutlined}>search</span></button>
+                <input type="text" placeholder="Search" className={styles.input} value={search} onChange={e => setSearch(e.target.value)}/>
+                <button 
+                    type="button" 
+                    className={styles.button}
+                    onClick={() =>{ navigate(`/browse?search=${search}`); navigate(0);}}
+                >
+                    <span 
+                        id="material-symbols-outlined" 
+                        className={styles.button + styles.materialSymbolsOutlined}
+                    >
+                        search
+                    </span>
+                </button>
             </nav>
             {accountSection}
         </header>

@@ -16,9 +16,7 @@ public class Program
 
         builder.Services.AddControllers();
         builder.Services.AddTransient<AuthToken>();
-        builder.Services.AddScoped<ICommerceService, CommerceService>();
-        builder.Services.AddScoped<IAuthService, AuthService>();
-        builder.Services.AddScoped<IAccountService, AccountService>();
+        builder.Services.AddCustomServices();
         // Learn more about configuring Swagger/OpenAPI at https://aka.ms/aspnetcore/swashbuckle 
 
         builder.Services.AddEndpointsApiExplorer(); 

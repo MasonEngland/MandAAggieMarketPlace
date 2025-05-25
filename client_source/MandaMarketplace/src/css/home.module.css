@@ -2,3 +2,7 @@
     display: flex;
     overflow: scroll;
 }
+
+.cardContainer > div {
+    margin: 30px;
+}

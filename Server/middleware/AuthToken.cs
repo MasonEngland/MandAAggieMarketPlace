@@ -11,7 +11,7 @@ public class AuthToken : IMiddleware
 
         string path = context.Request.Path;
 
-        if (!path.Contains("/Api") || path.Contains("/Auth") || path.Contains("/GetStock") || path.Contains("/GetItem"))
+        if (!path.Contains("/Api") || path.Contains("/Auth") || path.Contains("/GetStock") || path.Contains("/GetItem") || path.Contains("/Search"))
         {
             await next(context);
             return;

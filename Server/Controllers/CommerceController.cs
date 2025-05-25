@@ -122,7 +122,7 @@ public class CommerceController : Controller
             Item[] items = await _commerceService.GetItemsBySearch(searchTerm);
             return Ok(new 
             {
-                items,
+                stock = items,
                 success = true
             });
         } catch (Exception err)

@@ -27,12 +27,12 @@ public class Program
 
         var app = builder.Build();
 
-        //! remove during deployment
-        app.UseCors(builder => {
-            builder.WithOrigins("http://localhost:5173");
-            builder.AllowAnyMethod();
-            builder.AllowAnyHeader();
-        });
+        // //! remove during deployment
+        // app.UseCors(builder => {
+        //     builder.WithOrigins("http://localhost:5173");
+        //     builder.AllowAnyMethod();
+        //     builder.AllowAnyHeader();
+        // });
 
         app.UseAuthorization();
         

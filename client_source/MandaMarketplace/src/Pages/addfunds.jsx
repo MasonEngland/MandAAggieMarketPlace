@@ -20,7 +20,7 @@ export default function AddFunds() {
             "Authorization": `Bearer ${cookie}`,
         }
 
-        const response = await axios.put(`http://localhost:2501/Api/Accounts/Balance/${funds}`, {}, {headers: headers});
+        const response = await axios.put(`/Api/Accounts/Balance/${funds}`, {}, {headers: headers});
         if (response.data.success) {
             alert("Funds added successfully");
             location.href = "/settings"; // do a hfref naviagate so that account data refreshes

@@ -11,7 +11,7 @@ export default function Browse() {
     const search = searchParams.get('search') || '';
 
     useEffect(() => {
-        const url = search !== '' ? `http://localhost:2501/Api/Commerce/Search/${search}` : 'http://localhost:2501/Api/Commerce/GetStock/2';
+        const url = search !== '' ? `/Api/Commerce/Search/${search}` : '/Api/Commerce/GetStock/2';
         axios.get(url)
             .then(res => {
                 if (res.data.success === true) {

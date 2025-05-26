@@ -25,7 +25,7 @@ export default function Item(props) {
             navigate('/');
         }
 
-        axios.get(`http://localhost:2501/Api/Commerce/GetItem/${id}`)
+        axios.get(`/Api/Commerce/GetItem/${id}`)
         .then(res => {
             if (res.data.success === true) {
                 setItem(res.data.item);
@@ -70,7 +70,7 @@ export default function Item(props) {
 
 
         // make request to database
-        axios.post(`http://localhost:2501/Api/Commerce/Purchase/${address}`, {
+        axios.post(`/Api/Commerce/Purchase/${address}`, {
             ...item
         }, {
             headers: {

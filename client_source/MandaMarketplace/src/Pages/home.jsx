@@ -20,7 +20,7 @@ export default function Home() {
     useEffect(() => {
         const token = Cookies.get('token');
 
-        axios.get("http://localhost:2501/Api/Commerce/GetStock/1")
+        axios.get("/Api/Commerce/GetStock/1")
         .then((response) => {
             setCardData(response.data.stock);
         })
@@ -28,7 +28,7 @@ export default function Home() {
             console.log(error);
         });
 
-        axios.get("http://localhost:2501/Api/Commerce/Search/cloth",
+        axios.get("/Api/Commerce/Search/cloth",
         {
             headers: {
                 'Authorization': `Bearer ${token}`,
@@ -41,7 +41,7 @@ export default function Home() {
             console.log(error);
         });
 
-        axios.get("http://localhost:2501/Api/Commerce/Search/gam",
+        axios.get("/Api/Commerce/Search/gam",
         {
             headers: {
                 'Authorization': `Bearer ${token}`,

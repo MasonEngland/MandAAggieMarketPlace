@@ -3,8 +3,6 @@ import styles from "../css/settings.module.css"
 import {useEffect, useState, useContext} from 'react';
 import AuthContext from "../context/authContext";
 import Cookies from 'js-cookie';
-import axios from 'axios';
-import { useNavigate } from "react-router"
 
 export default function Settings() {
     const user = useContext(AuthContext);
@@ -42,7 +40,7 @@ export default function Settings() {
             body: JSON.stringify(account),
         }
 
-        const response = await fetch("http://localhost:2501/Api/Accounts/Update", options)
+        const response = await fetch("/Api/Accounts/Update", options)
         const res = await response.json();
         
         if (res.token == undefined ) return;

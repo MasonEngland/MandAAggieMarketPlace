@@ -14,7 +14,7 @@ export default async function verifyAccount() {
         'Authorization': `Bearer ${cookie}`,
         'content-type': 'application/json'
     }
-    const res = await axios.get("http://localhost:2501/Api/Accounts/GetAccount", {
+    const res = await axios.get("/Api/Accounts/GetAccount", {
         headers: headers
     });
     if (res.data.success === true) {

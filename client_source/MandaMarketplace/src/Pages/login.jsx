@@ -12,7 +12,7 @@ export default function Login() {
     const handleSubmit = async (e) => {
         e.preventDefault();
         
-        const response = await axios.post("http://localhost:2501/Api/Auth/Login", {
+        const response = await axios.post("/Api/Auth/Login", {
             Email: email,
             Password: password,
             FirstName: "",

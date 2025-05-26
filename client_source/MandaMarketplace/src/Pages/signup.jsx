@@ -14,7 +14,7 @@ export default function Signup() {
         e.preventDefault();
 
         try {
-            const response = await axios.post("http://localhost:2501/Api/Auth/Create", {
+            const response = await axios.post("/Api/Auth/Create", {
                 Email: email,
                 Password: password,
                 FirstName: firstName,

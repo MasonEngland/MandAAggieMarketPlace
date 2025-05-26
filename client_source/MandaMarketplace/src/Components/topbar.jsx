@@ -29,7 +29,7 @@ export default function Topbar(props) {
 
         if (!token || token == "") return;
 
-        axios.get("http://localhost:2501/Api/Accounts/GetAccount", {headers: {"authorization": 'Bearer ' + token}})
+        axios.get("/Api/Accounts/GetAccount", {headers: {"authorization": 'Bearer ' + token}})
         .then((response) => {
             let email = response.data.account.email
             setAccountSection(

@@ -24,7 +24,6 @@ public class AccountsController : Controller
         _db = db;
     }
 
-    // Route: /Api/Accounts/Delete/id
     [HttpDelete("{id}")]
     public async Task<IActionResult> DeleteAccount(String id) 
     {
@@ -44,7 +43,6 @@ public class AccountsController : Controller
         }
     }
 
-    // Route: /Api/Accounts/Balance/{funds}
     [HttpPut("Balance/{funds}")]
     public async Task<IActionResult> AddFunds(double funds)
     {
@@ -69,7 +67,6 @@ public class AccountsController : Controller
         return Ok(new { success = true });
     }
 
-    //Route: /Api/Accounts/Purchases
     [HttpGet("Purchases")]
     public async Task<IActionResult> GetPurchases() 
     {
@@ -116,7 +113,6 @@ public class AccountsController : Controller
         return Ok(new { success = true, account = account });
     }
 
-    // Route: /Api/Accounts/Update
     [HttpPut("Update")]
     public async Task<IActionResult> UpdateAccount([FromBody] Account account)
     {
@@ -147,7 +143,6 @@ public class AccountsController : Controller
         return Ok(new { success = true, account, token });
     }
 
-    // Route: /Api/Accounts/UpdatePassword
     [HttpPut("UpdatePassword")]
     public async Task<IActionResult> UpdatePassword([FromBody] Account account)
     {

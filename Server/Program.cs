@@ -1,3 +1,13 @@
+/*
+    * Manda Marketplace copyright (c) 2023-2025
+    * Created by Mason England
+    * 
+    * The structure of the server uses the Model View Controller (MVC) pattern.
+    * Then a service layer is added to handle business logic to handel database queries and data manipulation.
+    * Built on React, ASP.NET Core, MySQL, and Entity Framework Core.
+    *
+*/
+
 using Server.Context;
 using Microsoft.EntityFrameworkCore;
 using Server.Middleware;

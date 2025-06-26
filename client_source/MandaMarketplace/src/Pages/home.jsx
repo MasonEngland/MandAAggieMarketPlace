@@ -7,6 +7,12 @@ import Cookies from 'js-cookie';
 import AuthContext from '../context/authContext';
 
 export default function Home() {
+
+    /**
+     * this component is the home page and also works a featured page for the site
+     * there are three sections which dsiplay different commonly searched items.
+     * that means it makes 3 queries to get the data and thats what the useEffect hook is doing. 
+     */
     const [cardData, setCardData] = useState([{
         imageLink: "https://www.usu.edu/advancement/named-spaces/images/oldmain.jpg",
         name: "Old Main",

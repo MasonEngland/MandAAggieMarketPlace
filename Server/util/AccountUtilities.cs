@@ -7,6 +7,8 @@ namespace Server.Util;
 
 public static class AccountUtilities
 {
+
+    //TODO: change so that this only returns an account Id rather than full account
     public static Account? GetAccount(HttpContext context)
     {
         //

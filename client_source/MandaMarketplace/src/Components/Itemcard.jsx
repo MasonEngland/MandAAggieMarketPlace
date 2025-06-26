@@ -8,6 +8,7 @@ export default function Itemcard(props) {
         navigate(`/item?item=${props.data.id}`);
     }
 
+    //TODO: do something about longer item names
     return (
         <div className={styles.card}>
             <img src={props.data.imageLink} alt="item" />

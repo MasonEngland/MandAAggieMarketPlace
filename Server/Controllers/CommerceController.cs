@@ -22,10 +22,7 @@ public class CommerceController : Controller
         _db = db;
         _commerceService = commerceService;
     }
-    
-
-    // Helper function for deserializing the account info from token data  
-    
+        
 
     [HttpGet("GetStock/{queries}")]
     public object GetStock(int queries) 

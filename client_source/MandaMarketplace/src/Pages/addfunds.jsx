@@ -6,6 +6,11 @@ import Cookies from 'js-cookie';
 import {useNavigate} from 'react-router';
 
 export default function AddFunds() {
+    /**
+     * since the site doesnt work with real money, this is how you can easily add fake money to your account. 
+     * users will purchase items with fake money that can be added an infinite amount of times. 
+     * there is a chance a limit will need to be added but for now we can trust that users will not ruin the demo for other viewers.
+     */
 
     const [funds, setFunds] = useState(0);
     const navigate = useNavigate();

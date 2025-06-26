@@ -41,4 +41,10 @@ public class PagesController : Controller
     {
         return Redirect("/");
     }
+
+    [HttpGet("addFunds")]
+    public IActionResult AddFunds()
+    {
+        return File("index.html", "text/html");
+    }
 }

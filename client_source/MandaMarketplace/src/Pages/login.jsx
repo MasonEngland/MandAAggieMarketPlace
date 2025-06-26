@@ -1,4 +1,5 @@
 import axios from 'axios'
+import { AxiosError } from 'axios';
 import { useState } from 'react';
 import Cookies from 'js-cookie';
 import styles from '../css/login.module.css';
@@ -12,20 +13,30 @@ export default function Login() {
     const handleSubmit = async (e) => {
         e.preventDefault();
         
-        const response = await axios.post("/Api/Auth/Login", {
-            Email: email,
-            Password: password,
-            FirstName: "",
-            LastName: "",
-        });
-        if (response.data.success) {
-
-            Cookies.set('token', response.data.token, { expires: 7});
-            location.href = "/";
-        } 
-        else {
-            alert("Login failed. Please check your email and password.");
+        try {
+            const response = await axios.post("/Api/Auth/Login", {
+                Email: email,
+                Password: password,
+                FirstName: "",
+                LastName: "",
+            });
+            if (response.status === 200 && response.data.success) {
+                console.log(response.data);
+                Cookies.set('token', response.data.token, { expires: 7});
+                location.href = "/";
+            } 
+            else {
+                alert("Login failed. Please check your email and password.");
+            }
+        } catch (error) {
+            if (error instanceof AxiosError) {
+                alert("Login failed. Please check your email and password.");
+            } else {
+                console.error("An unexpected error occurred:", error);
+                alert("An unexpected error occurred. Please try again later.");
+            }
         }
+        
     }
 
 

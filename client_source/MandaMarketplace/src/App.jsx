@@ -7,6 +7,7 @@ import Settings from './Pages/settings';
 import Item from './Pages/item';
 import Signup from './Pages/signup';
 import AddFunds from './Pages/addfunds';
+import ChangePassword from './Pages/changePassword';
 import './css/app.css';
 import AuthContext from './context/authContext';
 import verifyAccount from './util/verifyAccount';
@@ -53,6 +54,7 @@ function App() {
           <Route path="/item" element={<Item />}  />
           <Route path="/signup" element={<Signup />} />
           <Route path="/addfunds" element={<PrivateRoute><AddFunds /></PrivateRoute>} />
+          <Route path="/changepassword" element={<PrivateRoute><ChangePassword /></PrivateRoute>} />
         </Routes>
       </BrowserRouter>
     </AuthContext.Provider>

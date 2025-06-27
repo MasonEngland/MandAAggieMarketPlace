@@ -47,4 +47,10 @@ public class PagesController : Controller
     {
         return File("index.html", "text/html");
     }
+
+    [HttpGet("changePassword")]
+    public IActionResult ChangePassword()
+    {
+        return File("index.html", "text/html");
+    }
 }

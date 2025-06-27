@@ -1,6 +1,7 @@
 using Server.Context;
 using Server.Models;
 using Microsoft.EntityFrameworkCore;
+using static BCrypt.Net.BCrypt;
 
 namespace Server.Services;
 
@@ -37,14 +38,22 @@ public class AccountService : IAccountService
 
     }
 
-    public async Task<bool> ChangePassword(string id, string newPassword)
+    public async Task<bool> ChangePassword(string id, string oldPassword, string newPassword)
     {
         try
         {
+            // verify old password
+            Account? account = await _db.accounts.Where(h => Convert.ToString(h.Id) == id).FirstOrDefaultAsync();
+            if (account == null || !Verify(oldPassword, account.Password))
+            {
+                return false;
+            }
+
+            // update password
             await _db.accounts
             .Where(h => Convert.ToString(h.Id) == id)
             .ExecuteUpdateAsync(setter => setter
-                .SetProperty(b => b.Password, newPassword)
+                .SetProperty(b => b.Password, HashPassword(newPassword))
             );
             return true;
         }

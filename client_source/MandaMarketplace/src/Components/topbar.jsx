@@ -11,7 +11,6 @@ export default function Topbar(props) {
     const [ search, setSearch ] = useState("");
     const navigate = useNavigate();
 
-    // initialize account section to be login and register
     const [ accountSection, setAccountSection ] = useState(
         <nav className={styles.nav}>
             <Link to="/login" className={styles.a + " " + (selected == 3 ? styles.selected : "")}>
@@ -23,7 +22,6 @@ export default function Topbar(props) {
         </nav>
     );
     
-    // check if user is logged in
     useEffect(() => {
         let token = Cookies.get('token');
 
@@ -42,7 +40,6 @@ export default function Topbar(props) {
         });
     }, []);
     
-    // check if the current page is slected
     const navitems = [
         <Link to="/" className={styles.a + " " + (selected == 0 ? styles.selected : "")} key="1">Home</Link>,
         <Link to="/browse" className={styles.a + " "  + (selected == 1 ? styles.selected: "")} key="2">Browse</Link>,

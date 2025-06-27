@@ -144,7 +144,7 @@ public class AccountsController : Controller
     }
 
     [HttpPut("UpdatePassword")]
-    public async Task<IActionResult> UpdatePassword([FromBody] Account account)
+    public async Task<IActionResult> UpdatePassword([FromBody] PasswordParams passwordParams)
     {
         Account? currentAccount = GetAccount(HttpContext);
         if (currentAccount == null)
@@ -152,12 +152,17 @@ public class AccountsController : Controller
             return Unauthorized(new { success = false });
         }
 
-        if (currentAccount.Id != account.Id)
+        if (Convert.ToString(currentAccount.Id) != passwordParams.AccountId)
         {
             return Unauthorized(new { success = false });
         }
 
-        bool result = await _accountService.ChangePassword(Convert.ToString(account.Id)!, account.Password);
+        bool result = await _accountService.ChangePassword(Convert.ToString(passwordParams.AccountId)!, passwordParams.OldPassword, passwordParams.NewPassword);
+
+        if (!result)
+        {
+            return BadRequest(new { success = false });
+        }
 
         return Ok(new { success = true });
     }

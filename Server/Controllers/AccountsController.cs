@@ -152,12 +152,7 @@ public class AccountsController : Controller
             return Unauthorized(new { success = false });
         }
 
-        if (Convert.ToString(currentAccount.Id) != passwordParams.AccountId)
-        {
-            return Unauthorized(new { success = false });
-        }
-
-        bool result = await _accountService.ChangePassword(Convert.ToString(passwordParams.AccountId)!, passwordParams.OldPassword, passwordParams.NewPassword);
+        bool result = await _accountService.ChangePassword(Convert.ToString(currentAccount.Id)!, passwordParams.OldPassword, passwordParams.NewPassword);
 
         if (!result)
         {

@@ -30,19 +30,21 @@ public class Program
         // Learn more about configuring Swagger/OpenAPI at https://aka.ms/aspnetcore/swashbuckle 
 
         builder.Services.AddEndpointsApiExplorer(); 
+
+        var DBConnectionString = builder.Configuration.GetConnectionString("Default")!;
         builder.Services.AddDbContext<DatabaseContext>(options => 
         {
-            options.UseMySQL(builder.Configuration.GetConnectionString("Default")!);
+            options.UseMySql(DBConnectionString, ServerVersion.AutoDetect(DBConnectionString));
         });
 
         var app = builder.Build();
 
         // //! remove during deployment
-        // app.UseCors(builder => {
-        //     builder.WithOrigins("http://localhost:5173");
-        //     builder.AllowAnyMethod();
-        //     builder.AllowAnyHeader();
-        // });
+        app.UseCors(builder => {
+            builder.AllowAnyOrigin();
+            builder.AllowAnyMethod();
+            builder.AllowAnyHeader();
+        });
 
         app.UseAuthorization();
         

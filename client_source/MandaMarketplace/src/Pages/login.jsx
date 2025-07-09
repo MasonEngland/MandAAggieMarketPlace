@@ -4,6 +4,7 @@ import { useState } from 'react';
 import Cookies from 'js-cookie';
 import styles from '../css/login.module.css';
 import USU_logo from '../assets/USU_logo.jpg';
+import serverUrl from '../util/serverurl';
 
 
 export default function Login() {
@@ -14,7 +15,7 @@ export default function Login() {
         e.preventDefault();
         
         try {
-            const response = await axios.post("/Api/Auth/Login", {
+            const response = await axios.post(`${serverUrl}/Api/Auth/Login`, {
                 Email: email,
                 Password: password,
                 FirstName: "",

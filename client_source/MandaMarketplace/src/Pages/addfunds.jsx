@@ -4,6 +4,7 @@ import {useState } from 'react';
 import axios from 'axios';
 import Cookies from 'js-cookie';
 import {useNavigate} from 'react-router';
+import serverUrl from '../util/serverurl';
 
 export default function AddFunds() {
     /**
@@ -25,7 +26,7 @@ export default function AddFunds() {
             "Authorization": `Bearer ${cookie}`,
         }
 
-        const response = await axios.put(`/Api/Accounts/Balance/${funds}`, {}, {headers: headers});
+        const response = await axios.put(`${serverUrl}/Api/Accounts/Balance/${funds}`, {}, {headers: headers});
         if (response.data.success) {
             alert("Funds added successfully");
             location.href = "/settings"; // do a hfref naviagate so that account data refreshes

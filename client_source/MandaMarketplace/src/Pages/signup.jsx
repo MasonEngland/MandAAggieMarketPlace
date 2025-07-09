@@ -3,6 +3,7 @@ import axios from "axios";
 import styles from "../css/login.module.css";
 import Cookies from "js-cookie";
 import logo from "../assets/USU_logo.jpg";
+import serverUrl from "../util/serverurl";
 
 export default function Signup() {
     const [email, setEmail] = useState("");
@@ -14,7 +15,7 @@ export default function Signup() {
         e.preventDefault();
 
         try {
-            const response = await axios.post("/Api/Auth/Create", {
+            const response = await axios.post(`${serverUrl}/Api/Auth/Create`, {
                 Email: email,
                 Password: password,
                 FirstName: firstName,

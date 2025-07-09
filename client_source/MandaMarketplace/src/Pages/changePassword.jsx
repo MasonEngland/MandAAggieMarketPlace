@@ -1,5 +1,6 @@
 import styles from '../css/login.module.css';
 import USU_logo from '../assets/USU_logo.jpg';
+import serverUrl from '../util/serverurl';
 import {useState} from 'react';
 
 export default function ChangePassword() {
@@ -14,7 +15,7 @@ export default function ChangePassword() {
         }
 
         try {
-            const response = await fetch("/Api/Accounts/ChangePassword", {
+            const response = await fetch(`${serverUrl}/Api/Accounts/ChangePassword`, {
                 method: "POST",
                 headers: {
                     "Content-Type": "application/json",

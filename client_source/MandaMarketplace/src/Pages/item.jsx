@@ -5,6 +5,7 @@ import { useSearchParams, useNavigate } from 'react-router';
 import axios from 'axios';
 import cookies from 'js-cookie';
 import AuthContext from '../context/authContext';
+import serverUrl from '../util/serverurl';
 
 export default function Item(props) {
 
@@ -25,7 +26,7 @@ export default function Item(props) {
             navigate('/');
         }
 
-        axios.get(`/Api/Commerce/GetItem/${id}`)
+        axios.get(`${serverUrl}/Api/Commerce/GetItem/${id}`)
         .then(res => {
             if (res.data.success === true) {
                 setItem(res.data.item);
@@ -70,7 +71,7 @@ export default function Item(props) {
 
 
         // make request to database
-        axios.post(`/Api/Commerce/Purchase/${address}`, {
+        axios.post(`${serverUrl}/Api/Commerce/Purchase/${address}`, {
             ...item
         }, {
             headers: {

@@ -4,7 +4,7 @@ import Card from '../Components/Itemcard';
 import { useEffect, useState, useContext } from 'react';
 import axios from 'axios';
 import Cookies from 'js-cookie';
-import AuthContext from '../context/authContext';
+import serverUrl from '../util/serverurl';
 
 export default function Home() {
 
@@ -26,7 +26,7 @@ export default function Home() {
     useEffect(() => {
         const token = Cookies.get('token');
 
-        axios.get("/Api/Commerce/GetStock/1")
+        axios.get(`${serverUrl}/Api/Commerce/GetStock/1`)
         .then((response) => {
             setCardData(response.data.stock);
         })
@@ -34,7 +34,7 @@ export default function Home() {
             console.log(error);
         });
 
-        axios.get("/Api/Commerce/Search/cloth",
+        axios.get(`${serverUrl}/Api/Commerce/Search/cloth`,
         {
             headers: {
                 'Authorization': `Bearer ${token}`,
@@ -47,7 +47,7 @@ export default function Home() {
             console.log(error);
         });
 
-        axios.get("/Api/Commerce/Search/gam",
+        axios.get(`${serverUrl}/Api/Commerce/Search/gaming`,
         {
             headers: {
                 'Authorization': `Bearer ${token}`,

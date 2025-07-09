@@ -4,6 +4,7 @@ import { useEffect, useState } from 'react';
 import { useSearchParams } from 'react-router';
 import Card from "../Components/itemcard";
 import axios from 'axios';
+import serverUrl from '../util/serverurl';
 
 export default function Browse() {
     const [items, setItems] = useState([]);
@@ -11,7 +12,7 @@ export default function Browse() {
     const search = searchParams.get('search') || '';
 
     useEffect(() => {
-        const url = search !== '' ? `/Api/Commerce/Search/${search}` : '/Api/Commerce/GetStock/2';
+        const url = search !== '' ? `${serverUrl}/Api/Commerce/Search/${search}` : `${serverUrl}/Api/Commerce/GetStock/2`;
         axios.get(url)
             .then(res => {
                 if (res.data.success === true) {

@@ -4,6 +4,8 @@ import { useNavigate } from 'react-router';
 export default function Itemcard(props) {
     const navigate = useNavigate();
     let shortenedName = function() {
+
+        // shorten longer names
         if (props.data.name.length > 40) {
             return props.data.name.substring(0, 40) + "...";
         }
@@ -14,7 +16,6 @@ export default function Itemcard(props) {
         navigate(`/item?item=${props.data.id}`);
     }
 
-    //TODO: do something about longer item names
     return (
         <div className={styles.card}>
             <img src={props.data.imageLink} alt="item" />

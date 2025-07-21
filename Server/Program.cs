@@ -11,7 +11,6 @@
 using Server.Context;
 using Microsoft.EntityFrameworkCore;
 using Server.Middleware;
-using Server.Services;
 
 namespace Server;
 

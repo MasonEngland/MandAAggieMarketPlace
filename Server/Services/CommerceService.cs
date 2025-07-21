@@ -1,7 +1,7 @@
 using Server.Context;
 using Server.Models;
 using Microsoft.EntityFrameworkCore;
-using Microsoft.EntityFrameworkCore.Metadata.Conventions;
+using static Server.Util.SearchUtilities;
 
 namespace Server.Services;
 
@@ -123,9 +123,9 @@ public class CommerceService : ICommerceService
 
             for (int i = 0; i < searchCandidates.Length; i++)
             {
-                int nameDistance = partial_levenshtein(searchTerm, searchCandidates[i].Name);
-                int descriptionDistance = partial_levenshtein(searchTerm, searchCandidates[i].Description);
-                int categoryDistance = partial_levenshtein(searchTerm, searchCandidates[i].Category);
+                int nameDistance = PartialLevenshtein(searchTerm, searchCandidates[i].Name);
+                int descriptionDistance = PartialLevenshtein(searchTerm, searchCandidates[i].Description);
+                int categoryDistance = PartialLevenshtein(searchTerm, searchCandidates[i].Category);
                 if (nameDistance < maxDistance || descriptionDistance < maxDistance || categoryDistance < maxDistance)
                 {
                     returnedItems.Add(searchCandidates[i]);
@@ -141,57 +141,5 @@ public class CommerceService : ICommerceService
             Console.WriteLine(err.Message);
             return Array.Empty<Item>();
         }
-    }
-
-    private int levenshtein(string query, string target)
-    {
-        int[,] d = new int[query.Length + 1, target.Length + 1];
-
-        for (int i = 0; i <= query.Length; i++)
-        {
-            d[i, 0] = i;
-        }
-
-        for (int j = 0; j <= target.Length; j++)
-        {
-            d[0, j] = j;
-        }
-
-        for (int i = 1; i <= query.Length; i++)
-        {
-            for (int j = 1; j <= target.Length; j++)
-            {
-                int cost = (query[i - 1] == target[j - 1]) ? 0 : 1;
-
-                d[i, j] = Math.Min(Math.Min(d[i - 1, j] + 1, d[i, j - 1] + 1), d[i - 1, j - 1] + cost);
-            }
-        }
-
-        return d[query.Length, target.Length];
-    }
-
-    private int partial_levenshtein(string query, string target)
-    {
-        if (string.IsNullOrEmpty(query) || string.IsNullOrEmpty(target))
-            return Math.Max(query.Length, target.Length);
-
-        int minDist = int.MaxValue;
-        int window = query.Length;
-
-        // If target is shorter than query, just compare them directly
-        if (target.Length < window)
-            return levenshtein(query, target);
-
-        for (int i = 0; i <= target.Length - window; i++)
-        {
-            string sub = target.Substring(i, window);
-            int dist = levenshtein(query, sub);
-            if (dist < minDist)
-                minDist = dist;
-            // Early exit if perfect match
-            if (minDist == 0)
-                break;
-        }
-        return minDist;
     }
 }

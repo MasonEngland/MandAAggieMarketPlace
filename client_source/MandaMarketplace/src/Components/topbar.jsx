@@ -2,8 +2,7 @@ import styles from '../css/topbar.module.css';
 import USU_logo from '../assets/USU_logo.jpg';
 import Cookies from 'js-cookie';
 import axios from 'axios';
-import { useState } from 'react';
-import { useEffect } from 'react';
+import { useState, useEffect } from 'react';
 import { Link, useNavigate } from 'react-router';
 
 export default function Topbar(props) {

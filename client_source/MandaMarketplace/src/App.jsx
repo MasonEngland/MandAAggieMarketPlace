@@ -19,11 +19,9 @@ function App() {
 
   useEffect(() => {
     verifyAccount().then((data) => {
-      console.log(data);
       setUser(data);
     })
     .catch((err) => {
-      console.log(err);
       setUser({authenticated: false});
     })
     .finally(() => {

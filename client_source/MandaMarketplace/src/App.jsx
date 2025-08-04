@@ -12,6 +12,7 @@ import './css/app.css';
 import AuthContext from './context/authContext';
 import verifyAccount from './util/verifyAccount';
 import { Navigate } from 'react-router';
+import 'material-symbols';
 
 function App() {
   let [user, setUser] = useState({authenticated: false});

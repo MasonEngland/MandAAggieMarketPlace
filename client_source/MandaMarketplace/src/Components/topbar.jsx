@@ -1,14 +1,16 @@
 import styles from '../css/topbar.module.css';
 import USU_logo from '../assets/USU_logo.jpg';
-import Cookies from 'js-cookie';
-import axios from 'axios';
-import { useState, useEffect } from 'react';
+import { useState, useEffect, useContext } from 'react';
 import { Link, useNavigate } from 'react-router';
+import Dropdown from './dropdown';
+import AuthContext from '../context/authContext';
 
 export default function Topbar(props) {
     let selected = props.pageNumber;
     const [ search, setSearch ] = useState("");
     const navigate = useNavigate();
+    const user = useContext(AuthContext);
+
 
     const [ accountSection, setAccountSection ] = useState(
         <nav className={styles.nav}>
@@ -20,24 +22,27 @@ export default function Topbar(props) {
             </Link>
         </nav>
     );
-    
+
+
+    // check if user is logged in and change account section accordingly
     useEffect(() => {
-        let token = Cookies.get('token');
-
-        if (!token || token == "") return;
-
-        axios.get("/Api/Accounts/GetAccount", {headers: {"authorization": 'Bearer ' + token}})
-        .then((response) => {
-            let email = response.data.account.email
+        if (user.authenticated) {
+            let email = user.email;
+            
+            const ddOptions = [
+                <Link to="/settings" className={styles.a}>Account</Link>,
+                "View Order Status",
+                "Go To Cart",
+            ]
             setAccountSection(
                 <nav>
-                    <Link to="/settings" className={styles.a + " " + (selected == 5 ? styles.selected : "")}><b className={styles.b}>{email}</b></Link>
+                    <Dropdown options={ddOptions} selectedOption={email} isSelector={false}/>
                 </nav>
-            );
-        }).catch((error) => {
-            console.log(error);
-        });
-    }, []);
+            )
+        }
+    }, [user]);
+
+
     
     const navitems = [
         <Link to="/" className={styles.a + " " + (selected == 0 ? styles.selected : "")} key="1">Home</Link>,
@@ -58,8 +63,7 @@ export default function Topbar(props) {
                     onClick={() =>{ navigate(`/browse?search=${search}`); navigate(0);}}
                 >
                     <span 
-                        id="material-symbols-outlined" 
-                        className={styles.button + styles.materialSymbolsOutlined}
+                        className={"material-symbols-outlined"}
                     >
                         search
                     </span>

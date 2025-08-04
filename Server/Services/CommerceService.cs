@@ -2,6 +2,9 @@ using Server.Context;
 using Server.Models;
 using Microsoft.EntityFrameworkCore;
 using static Server.Util.SearchUtilities;
+using System.Data.Common;
+using System.Text;
+using MySqlConnector;
 
 namespace Server.Services;
 
@@ -42,7 +45,7 @@ public class CommerceService : ICommerceService
             Item? dbResults = await _db.CurrentStock
                 .FirstOrDefaultAsync(i => i.Id == item.Id || i.Name == item.Name);
 
-            if (dbResults == null)
+            if (dbResults != null)
             {
                 await _db.CurrentStock
                 .Where(h => h.Id == item.Id || h.Name == item.Name)
@@ -103,18 +106,29 @@ public class CommerceService : ICommerceService
     {
         try
         {
-            // pick a random character for filter
-            int randomIndex = new Random().Next(0, searchTerm.Length);
-            int maxDistance = Math.Min(3, searchTerm.Length / 3);
 
+            int maxDistance = Math.Min(5, searchTerm.Length / 3);
             List<Item> returnedItems = new List<Item>();
-            char filteredTerm = searchTerm[randomIndex];
 
-            Item[] searchCandidates = await _db.CurrentStock
-                .Where(i => i.Name.Contains($"{filteredTerm}") || i.Description.Contains($"{filteredTerm}") || i.Category.Contains($"{filteredTerm}"))
-                .Skip((page - 1) * pageSize)
-                .Take(pageSize)
-                .ToArrayAsync();
+
+
+
+            // builds an SQL to query all items that share at least one character with the search term
+            var sb = new StringBuilder();
+            sb.Append("SELECT * FROM CurrentStock WHERE ");
+            for (int i = 0; i < searchTerm.Length; i++)
+            {
+                if (i > 0)
+                    sb.Append(" OR ");
+
+                sb.Append($"Name LIKE CONCAT('%', @p{i}, '%')");
+                sb.Append($" OR Description LIKE CONCAT('%', @p{i}, '%')");
+                sb.Append($" OR Category LIKE CONCAT('%', @p{i}, '%')");
+            }
+            MySqlParameter[] parameters = searchTerm.Select((c, i) => new MySqlParameter($"@p{i}", c.ToString())).ToArray();
+            Item[] searchCandidates = await _db.CurrentStock.FromSqlRaw(sb.ToString(), parameters).ToArrayAsync();
+
+
 
             if (searchCandidates.Length == 0)
             {
@@ -136,7 +150,7 @@ public class CommerceService : ICommerceService
             return returnedItems.ToArray();
 
         }
-        catch (Exception err)
+        catch (DbException err)
         {
             Console.WriteLine(err.Message);
             return Array.Empty<Item>();

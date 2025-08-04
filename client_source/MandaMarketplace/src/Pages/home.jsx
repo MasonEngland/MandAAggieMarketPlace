@@ -54,7 +54,6 @@ export default function Home() {
             }
         }
         ).then((response) => {
-            console.log(response.data);
             setGaming(response.data.stock);
         })
         .catch((error) => {

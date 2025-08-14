@@ -95,7 +95,8 @@ public class CommerceService : ICommerceService
         {
             OrderItem = dbItem,
             OwnerId = Convert.ToString(account.Id)!,
-            Adress = address
+            Address = address,
+            Amount = item.Stock
         });
         await _db.SaveChangesAsync();
 

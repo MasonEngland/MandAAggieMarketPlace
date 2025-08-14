@@ -1,10 +1,10 @@
 namespace Server.Models;
 
-public class Order
+public class CartItem
 {
     public Guid Id { get; set; }
 
-    public required Item OrderItem { get; set; }
+    public required Item OrderItemId { get; set; }
 
     public required string OwnerId { get; set; }
 
@@ -13,7 +13,7 @@ public class Order
     public DateTime Date { get; set; }
     public int Amount { get; set; }
 
-    public Order()
+    public CartItem()
     {
         Id = Guid.NewGuid();
         Date = DateTime.Now;

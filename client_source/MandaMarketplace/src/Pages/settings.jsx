@@ -11,7 +11,8 @@ export default function Settings() {
     const [account, setAccount] = useState({
         firstName: "",
         lastName: "",
-        email: ""
+        email: "",
+        password: ""
     });
 
     useEffect(() => {
@@ -19,7 +20,8 @@ export default function Settings() {
             firstName: user.firstName,
             lastName: user.lastName,
             email: user.email,
-            balance: user.balance
+            balance: user.balance,
+            password: ""
         });
     }, [])
 

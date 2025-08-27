@@ -122,12 +122,10 @@ public class AccountsController : Controller
             return Unauthorized(new { success = false });
         }
 
-        if (currentAccount.Id != account.Id)
-        {
-            return Unauthorized(new { success = false });
-        }
+        account.Id = currentAccount.Id;
 
-        if (account.FirstName == "" || account.LastName == "" || account.Email == "") {
+        if (account.FirstName == "" || account.LastName == "" || account.Email == "")
+        {
             return BadRequest(new { success = false, message = "field missing" });
         }
 

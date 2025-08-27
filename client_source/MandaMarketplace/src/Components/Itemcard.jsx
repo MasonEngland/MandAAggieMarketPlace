@@ -2,7 +2,6 @@ import styles from '../css/itemcard.module.css';
 import { useNavigate } from 'react-router';
 
 export default function Itemcard(props) {
-    console.log(props.data);
     const navigate = useNavigate();
     let shortenedName = function() {
 

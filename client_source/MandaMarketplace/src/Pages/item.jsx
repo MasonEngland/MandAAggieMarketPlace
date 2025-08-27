@@ -80,7 +80,6 @@ export default function Item(props) {
         })
         .then(res => {
             if (res.data.success === true) {
-                console.log(res);
                 alert(res.data.message);
                 location.href = '/';
             }

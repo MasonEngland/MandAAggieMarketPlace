@@ -13,8 +13,12 @@ public class ShoppingCartService : IShoppingCartService
     }
     public async Task<bool> AddToCart(Item item, string userId, string address)
     {
-        Account? userAccont = await _db.accounts.FirstOrDefaultAsync(a => a.Id.ToString() == userId);
-        if (userAccont == null)
+        /*
+        * only returns true if the item request is succefully added to the users shopping cart 
+        */
+
+        Account? userAccount = await _db.accounts.FirstOrDefaultAsync(a => a.Id.ToString() == userId);
+        if (userAccount == null)
         {
             return false;
         }
@@ -25,6 +29,10 @@ public class ShoppingCartService : IShoppingCartService
             return false;
         }
 
+        if (dbItem.Stock <= 0) return false;
+        dbItem.Stock--;
+
+
         CartItem cartItem = new CartItem
         {
             OrderItemId = dbItem,
@@ -33,7 +41,10 @@ public class ShoppingCartService : IShoppingCartService
             Amount = item.Stock
         };
         _db.CartItems.Add(cartItem);
-        await _db.SaveChangesAsync();
+
+        try { await _db.SaveChangesAsync(); }
+        catch (Exception err) { Console.WriteLine(err.Message);  return false; }
+
         return true;
     }
 
@@ -56,7 +67,18 @@ public class ShoppingCartService : IShoppingCartService
 
     public async Task<bool> PurchaseCartItems(string userId)
     {
-        CartItem[] dbItems = await _db.CartItems.Where(p => Convert.ToString(p.OwnerId) == userId).ToArrayAsync();
+        /**
+        * Method to purchase ALL items in a users shopping cart
+        * will ONLY return true if all the items are purchased succesfully
+        * users will have the opportunity to purchase items from their cart individually as well 
+        */
+
+
+        CartItem[] dbItems = await _db.CartItems.Where(p => p.OwnerId == userId).ToArrayAsync();
+        Account? user = await _db.accounts.Where(p => p.Id.ToString() == userId).FirstOrDefaultAsync();
+
+        if (user == null) return false;
+
 
         if (dbItems.Length < 1)
         {
@@ -67,6 +89,11 @@ public class ShoppingCartService : IShoppingCartService
 
         for (int i = 0; i < dbItems.Length; i++)
         {
+            if (user.Balance < dbItems[i].OrderItemId.Price) return false;
+            user.Balance -= dbItems[i].OrderItemId.Price;
+            dbItems[i].OrderItemId.Stock--;
+            
+
             var newOrder = new Order()
             {
                 OwnerId = userId,
@@ -77,13 +104,12 @@ public class ShoppingCartService : IShoppingCartService
 
             _db.OrderQueue.Add(newOrder);
             orderedItems[i] = dbItems[i].OrderItemId;
+            _db.CartItems.Remove(dbItems[i]);
         }
         
-        try
-        {
-            await _db.SaveChangesAsync();
-        }
-        catch (Exception) { return false; }
+       
+        await _db.SaveChangesAsync();
+        
 
         return true;
     }

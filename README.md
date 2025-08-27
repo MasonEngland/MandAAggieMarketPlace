@@ -23,4 +23,4 @@ the main technologies used are:
 
 ### more details
 
-this app does not perform real transactions but does use real database queries with hashed passwords. the idea is that in order to turn this FAKE ecommerce site into a real ecommerce site would only take some form of transaction function and a form of deployment either using AWS or Docker.  
+this app does not perform real transactions but does use real database queries with hashed passwords. the idea is that in order to turn this FAKE ecommerce site into a real ecommerce site would only take some form of transaction function and a form of deployment.

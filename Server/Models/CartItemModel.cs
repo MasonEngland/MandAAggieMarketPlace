@@ -4,7 +4,9 @@ public class CartItem
 {
     public Guid Id { get; set; }
 
-    public required Item OrderItemId { get; set; }
+    public required Item OrderItem { get; set; }
+
+    public Guid OrderItemId { get; set; }
 
     public required string OwnerId { get; set; }
 

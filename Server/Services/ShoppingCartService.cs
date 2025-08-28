@@ -35,7 +35,7 @@ public class ShoppingCartService : IShoppingCartService
 
         CartItem cartItem = new CartItem
         {
-            OrderItemId = dbItem,
+            OrderItem = dbItem,
             OwnerId = userId,
             Address = address,
             Amount = item.Stock
@@ -54,7 +54,7 @@ public class ShoppingCartService : IShoppingCartService
         {
             return await _db.CartItems
             .Where(ci => ci.OwnerId == userId)
-            .Select(ci => ci.OrderItemId)
+            .Select(ci => ci.OrderItem)
             .ToArrayAsync();
         }
         catch (Exception err)
@@ -89,21 +89,21 @@ public class ShoppingCartService : IShoppingCartService
 
         for (int i = 0; i < dbItems.Length; i++)
         {
-            if (user.Balance < dbItems[i].OrderItemId.Price) return false;
-            user.Balance -= dbItems[i].OrderItemId.Price;
-            dbItems[i].OrderItemId.Stock--;
+            if (user.Balance < dbItems[i].OrderItem.Price) return false;
+            user.Balance -= dbItems[i].OrderItem.Price;
+            dbItems[i].OrderItem.Stock--;
             
 
             var newOrder = new Order()
             {
                 OwnerId = userId,
-                OrderItem = dbItems[i].OrderItemId,
+                OrderItem = dbItems[i].OrderItem,
                 Address = dbItems[i].Address,
                 Amount = dbItems[i].Amount
             };
 
             _db.OrderQueue.Add(newOrder);
-            orderedItems[i] = dbItems[i].OrderItemId;
+            orderedItems[i] = dbItems[i].OrderItem;
             _db.CartItems.Remove(dbItems[i]);
         }
         

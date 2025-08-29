@@ -30,7 +30,6 @@ public class ShoppingCartService : IShoppingCartService
         }
 
         if (dbItem.Stock <= 0) return false;
-        dbItem.Stock--;
 
 
         CartItem cartItem = new CartItem
@@ -89,9 +88,12 @@ public class ShoppingCartService : IShoppingCartService
 
         for (int i = 0; i < dbItems.Length; i++)
         {
+            
             if (user.Balance < dbItems[i].OrderItem.Price) return false;
             user.Balance -= dbItems[i].OrderItem.Price;
-            dbItems[i].OrderItem.Stock--;
+
+            if (dbItems[i].OrderItem.Stock < dbItems[i].Amount) return false;
+            dbItems[i].OrderItem.Stock -= dbItems[i].Amount;
             
 
             var newOrder = new Order()

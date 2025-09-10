@@ -8,6 +8,7 @@ import Item from './Pages/item';
 import Signup from './Pages/signup';
 import AddFunds from './Pages/addfunds';
 import ChangePassword from './Pages/changePassword';
+import CartPage from './Pages/cartPage';
 import './css/app.css';
 import AuthContext from './context/authContext';
 import verifyAccount from './util/verifyAccount';
@@ -54,6 +55,7 @@ function App() {
           <Route path="/signup" element={<Signup />} />
           <Route path="/addfunds" element={<PrivateRoute><AddFunds /></PrivateRoute>} />
           <Route path="/changepassword" element={<PrivateRoute><ChangePassword /></PrivateRoute>} />
+          <Route path="/cart" element={<PrivateRoute><CartPage /></PrivateRoute>} />
         </Routes>
       </BrowserRouter>
     </AuthContext.Provider>

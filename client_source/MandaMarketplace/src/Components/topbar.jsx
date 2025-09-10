@@ -32,7 +32,7 @@ export default function Topbar(props) {
             const ddOptions = [
                 <Link to="/settings" className={styles.a}>Account</Link>,
                 "View Order Status",
-                "Go To Cart",
+                <Link to="/cart" className={styles.a}>Go To Cart</Link>
             ]
             setAccountSection(
                 <nav>

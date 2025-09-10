@@ -19,26 +19,26 @@ public class CartController : Controller
         Account? account = AccountUtilities.GetAccount(HttpContext);
         if (account == null)
         {
-            return Unauthorized("User not authenticated.");
+            return Unauthorized(new { message = "User not authenticated.", success = false });
         }
         bool result = await _cartService.AddToCart(item, Convert.ToString(account?.Id)!, address);
 
         if (result)
         {
-            return Ok("Item added to cart successfully.");
+            return Ok(new { success = true });
         }
 
-        return BadRequest("Failed to add item to cart.");
+        return BadRequest(new { msg = "Failed to add item to cart." , success = false});
     }
 
     [HttpGet("GetCart")]
     public async Task<IActionResult> GetCartItems()
     {
         Account? user = AccountUtilities.GetAccount(HttpContext);
-        if (user == null) return BadRequest("user could not be found");
+        if (user == null) return BadRequest(new { msg = "user could not be found", success = false });
 
         Item[] cartItems = await _cartService.GetCartItems(user.Id.ToString());
-        return Ok(cartItems);
+        return Ok(new { success = true, cartItems });
     }
 
     [HttpGet("PurchaseCartItems")]
@@ -46,12 +46,12 @@ public class CartController : Controller
     {
         Account? user = AccountUtilities.GetAccount(HttpContext);
 
-        if (user == null) return BadRequest("could not find user");
+        if (user == null) return BadRequest(new { msg = "could not find user", success = false });
 
         bool success = await _cartService.PurchaseCartItems(user.Id.ToString());
 
-        if (success) return Ok();
+        if (success) return Ok(new { success = true });
 
-        return BadRequest("Could not purchase all cart items");
+        return BadRequest(new { msg = "Could not purchase all cart items", success = false });
     }
 }

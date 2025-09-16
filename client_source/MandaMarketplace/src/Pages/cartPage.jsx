@@ -7,12 +7,13 @@ export default function cartPage() {
         title: "Sample Item",
         stock: 2,
         imageLink: "https://via.placeholder.com/150",
+        description: "This is a sample item description.",
         price: 19.99
     }
     return (
         <>
         <TopBar />
-        <div className="container">
+        <div className="container" style={{marginTop: "15px"}}>
             <HorizontalCard item={item} onClick={() => console.log("test")} onRemove={() => console.log("removed")}/>
         </div>
         </>

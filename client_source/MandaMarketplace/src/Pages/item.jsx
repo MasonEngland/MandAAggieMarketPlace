@@ -92,6 +92,45 @@ export default function Item(props) {
         });
     }
 
+    const addToCart = async () => {
+        let token = cookies.get('token');
+        if (token == null || token === undefined || token === '') {
+            navigate('/login', {replace: true});
+            return;
+        }
+        if (address === '') {
+            alert('Please enter an address');
+            return;
+        }
+        if (quantity === 0) {
+            return;
+        }
+
+        const options  = {
+            method: 'POST',
+            url: `${serverUrl}/Api/Cart/AddToCart/${address}`,
+            headers: {
+                'Authorization': `Bearer ${token}`,
+                'Content-Type': 'application/json'
+            },
+            body : JSON.stringify({
+                ...item,
+                stock: quantity
+            })
+        }
+
+        const response = await fetch(options.url, options);
+        const data = await response.json();
+
+        if (!data.success) {
+            alert(data.message);
+            return;
+        }
+
+        console.log(data);
+
+    }
+
 
     return (
         <div className={styles.item}>
@@ -112,7 +151,8 @@ export default function Item(props) {
                         <input type="number" placeholder="Quantity" className={styles.input} onChange={(e) => setQuantity(e.target.value)}/>
                         <input type="text" placeholder="Address" className={styles.input} value={address} onChange={(e) => setAddress(e.target.value)}/>
                     </span>
-                    <button className={styles.button} style={{cursor: 'pointer'}} onClick={() => purchase()}>Purchase</button>
+                    <button className ={styles.button} style={{cursor: 'pointer'}} onClick={() => addToCart()}>Add to Cart</button>
+                    <button className={styles.button} style={{cursor: 'pointer', marginTop: 12}} onClick={() => purchase()}>Purchase Now</button>
                 </div>
             </div>
         </div>

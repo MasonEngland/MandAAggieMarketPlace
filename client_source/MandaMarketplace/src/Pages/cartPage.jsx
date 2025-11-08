@@ -1,21 +1,42 @@
 import TopBar from "../Components/TopBar";
 import HorizontalCard from "../Components/horizontalcard";
-import logo from '../assets/old_main.jpeg';
+import { useEffect, useState } from "react";
+import serverUrl from "../util/serverurl";
+import Cookies from "js-cookie";
 
 export default function cartPage() {
-    const item = {
-        id: 1,
-        title: "Sample Item",
-        stock: 2,
-        imageLink: logo,
-        description: "This is a sample item description.",
-        price: 19.99
+    const [items, setItems] = useState([]);
+
+    const getCartItems = async () => {
+        let token = Cookies.get("token");
+        if (token == null || token === undefined || token === "") {
+            location.href = "/login";
+        }
+
+        const headers = {
+            'Authorization': `Bearer ${token}`,
+            'content-type': 'application/json'
+        }
+        const response = await fetch(`${serverUrl}/Api/Cart/GetCart`, { headers });
+        const data = await response.json();
+        setItems(data.cartItems);
     }
+
+    useEffect(() => {
+       getCartItems();
+
+
+    }, []);
+
     return (
         <>
         <TopBar />
         <div className="container" style={{marginTop: "15px"}}>
-            <HorizontalCard item={item} onClick={() => console.log("test")} onRemove={() => console.log("removed")}/>
+            {items.length === 0 ? (
+                <h2>Your cart is empty.</h2>
+            ) : (
+                items.map((item, index) => (<HorizontalCard key={index} item={item} onRemove={() => setItems(items.filter(p => p.id != item.id))}></HorizontalCard>))
+            )}
         </div>
         </>
     )

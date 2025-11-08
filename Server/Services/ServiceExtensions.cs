@@ -9,5 +9,6 @@ public static class ServiceExtensions
         services.AddScoped<ICommerceService, CommerceService>();
         services.AddScoped<IAuthService, AuthService>();
         services.AddScoped<IAccountService, AccountService>();
+        services.AddScoped<IShoppingCartService, ShoppingCartService>();
     }
 }

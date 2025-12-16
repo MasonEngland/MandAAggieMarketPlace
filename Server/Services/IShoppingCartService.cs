@@ -14,4 +14,6 @@ public interface IShoppingCartService
     // returns true if purchase was successful for all items
     // returns false if any items failed
     public Task<bool> PurchaseCartItems(string userId);
+
+    public Task<bool> RemoveFromCart(string itemId, string userId);
 }

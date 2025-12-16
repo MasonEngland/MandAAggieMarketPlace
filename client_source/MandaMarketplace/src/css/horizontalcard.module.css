@@ -10,6 +10,7 @@
 
 .body > *, .body > span {
     background-color: white;
+    margin: 5px;
 }
 
 .image {

@@ -16,7 +16,7 @@ export default function HorizontalCard({ item, onRemove, onClick }) {
                         <span className={styles.span}>{item.description}</span>
                     </div>
                     <div className={styles.stock_price}>
-                        <span className={styles.span}>Amount: {item.stock}</span>
+                        <span className={styles.span}>Quantity: {item.stock}</span>
                         <span className={styles.span}>Price: ${item.price}</span>
                     </div>
                 </div>

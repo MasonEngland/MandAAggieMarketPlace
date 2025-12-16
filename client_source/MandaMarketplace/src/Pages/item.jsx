@@ -105,7 +105,7 @@ export default function Item(props) {
         if (quantity === 0) {
             return;
         }
-
+        
         const options  = {
             method: 'POST',
             url: `${serverUrl}/Api/Cart/AddToCart/${address}`,
@@ -113,10 +113,7 @@ export default function Item(props) {
                 'Authorization': `Bearer ${token}`,
                 'Content-Type': 'application/json'
             },
-            body : JSON.stringify({
-                ...item,
-                stock: quantity
-            })
+            body : JSON.stringify(item)
         }
 
         const response = await fetch(options.url, options);
@@ -127,7 +124,7 @@ export default function Item(props) {
             return;
         }
 
-        console.log(data);
+        location.href = '/cart';
 
     }
 

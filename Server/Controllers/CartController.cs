@@ -28,14 +28,14 @@ public class CartController : Controller
             return Ok(new { success = true });
         }
 
-        return BadRequest(new { msg = "Failed to add item to cart." , success = false});
+        return BadRequest(new { message = "Failed to add item to cart." , success = false});
     }
 
     [HttpGet("GetCart")]
     public async Task<IActionResult> GetCartItems()
     {
         Account? user = AccountUtilities.GetAccount(HttpContext);
-        if (user == null) return BadRequest(new { msg = "user could not be found", success = false });
+        if (user == null) return BadRequest(new { message = "user could not be found", success = false });
 
         Item[] cartItems = await _cartService.GetCartItems(user.Id.ToString());
         return Ok(new { success = true, cartItems });
@@ -46,12 +46,32 @@ public class CartController : Controller
     {
         Account? user = AccountUtilities.GetAccount(HttpContext);
 
-        if (user == null) return BadRequest(new { msg = "could not find user", success = false });
+        if (user == null) return BadRequest(new { message = "could not find user", success = false });
 
         bool success = await _cartService.PurchaseCartItems(user.Id.ToString());
 
         if (success) return Ok(new { success = true });
 
-        return BadRequest(new { msg = "Could not purchase all cart items", success = false });
+        return BadRequest(new { message = "Could not purchase all cart items", success = false });
+    }
+
+    [HttpDelete("RemoveFromCart/{itemId}")]
+    public async Task<IActionResult> RemoveFromCart(string itemId)
+    {
+        Account? user = AccountUtilities.GetAccount(HttpContext);
+        if (user == null)
+        {
+            return BadRequest(new { message = "could not find user", success = false });
+        }
+
+        bool success = await _cartService.RemoveFromCart(itemId, user.Id.ToString());
+
+        if (success)
+        {
+            return Ok(new { success = true });
+
+        }
+
+        return BadRequest(new { message = "Could not remove item from cart", success = false });
     }
 }

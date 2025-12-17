@@ -1,4 +1,5 @@
 import styles from '../css/horizontalcard.module.css';
+import {useNavigate} from 'react-router';
 
 export default function HorizontalCard({ item, onRemove, onClick }) {
     /**
@@ -6,6 +7,10 @@ export default function HorizontalCard({ item, onRemove, onClick }) {
      * onRemove: function to remove item from cart
      * onClick: function to navigate to item details page
      */
+
+    const navigate = useNavigate();
+
+
     return (
         <div onClick={() => onClick()} className={styles.body}>
             <img src={item.imageLink} alt="item" className={styles.image} />
@@ -22,7 +27,7 @@ export default function HorizontalCard({ item, onRemove, onClick }) {
                 </div>
                 <div className={styles.actions}>
                     <button onClick={() => onRemove()} className={styles.button}>Remove</button>
-                    <button className={styles.button}>Details</button>
+                    <button className={styles.button}>Purchase</button>
                 </div>
             </div>
         </div>

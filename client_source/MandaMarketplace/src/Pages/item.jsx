@@ -102,10 +102,12 @@ export default function Item(props) {
             alert('Please enter an address');
             return;
         }
-        if (quantity === 0) {
+        if (quantity <= 0) {
             return;
         }
-        
+
+        item.stock = quantity;
+
         const options  = {
             method: 'POST',
             url: `${serverUrl}/Api/Cart/AddToCart/${address}`,

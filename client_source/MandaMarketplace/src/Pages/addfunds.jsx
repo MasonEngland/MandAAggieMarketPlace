@@ -26,6 +26,11 @@ export default function AddFunds() {
             "Authorization": `Bearer ${cookie}`,
         }
 
+        if (isNaN(funds) || funds <= 0) {
+            alert("Please enter a valid amount of funds to add");
+            return;
+        }
+
         const response = await axios.put(`${serverUrl}/Api/Accounts/Balance/${funds}`, {}, {headers: headers});
         if (response.data.success) {
             alert("Funds added successfully");

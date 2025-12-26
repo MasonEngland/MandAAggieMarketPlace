@@ -11,6 +11,8 @@
 using Server.Context;
 using Microsoft.EntityFrameworkCore;
 using Server.Middleware;
+using Stripe;
+using Stripe.Checkout;
 
 namespace Server;
 
@@ -22,6 +24,7 @@ public class Program
         var builder = WebApplication.CreateBuilder(args);
 
         // Add services to the container.
+        StripeConfiguration.ApiKey = Environment.GetEnvironmentVariable("STRIPE_API_KEY")!;
 
         builder.Services.AddControllers();
         builder.Services.AddTransient<AuthToken>();

@@ -187,4 +187,55 @@ public class CommerceController : Controller
         });
         
     }
+
+    //! this code is there to stock the database using fakestore API
+    //! do not delete and only uncomment for use
+    // [HttpGet("StockDb/GetStock")]
+    // public async Task<IActionResult> SyncItemsFromApi()
+    // {
+    //     try
+    //     {
+    //         // Fetch items from the FakeStore API
+    //         var items = await FetchItemsFromApiAsync();
+
+    //         // Add each item to the database
+    //         _db.CurrentStock.AddRange(items);
+
+    //         // Save changes to the database
+    //         await _db.SaveChangesAsync();
+
+    //         return Ok(new { message = "Items successfully added to the database." });
+    //     }
+    //     catch (Exception ex)
+    //     {
+    //         return StatusCode(500, new { message = ex.Message });
+    //     }
+    // }
+
+    // private async Task<List<Item>> FetchItemsFromApiAsync()
+    // {
+    //     using (var client = new HttpClient())
+    //     {
+    //         // Call the FakeStore API
+    //         var response = await client.GetStringAsync("https://fakestoreapi.com/products");
+
+    //         // Deserialize the response into a list of FakeStoreProduct objects
+    //         var fakeStoreProducts = JsonConvert.DeserializeObject<List<dynamic>>(response)!;
+
+    //         // Map FakeStoreProduct to Item
+    //         var items = fakeStoreProducts.Select(p => new Item
+    //         {
+    //             Name = p.title,
+    //             Stock = 100, // You might want to change this logic or add your own stock management
+    //             Description = p.description,
+    //             Price = p.price,
+    //             ImageLink = p.image,
+    //             Category = p.category
+    //         }).ToList();
+
+    //         return items;
+    //     }
+    // }
 }
+
+

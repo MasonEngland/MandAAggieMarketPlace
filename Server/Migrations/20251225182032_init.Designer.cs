@@ -11,8 +11,8 @@ using Server.Context;
 namespace Server.Migrations
 {
     [DbContext(typeof(DatabaseContext))]
-    [Migration("20250828012312_rename_ordereitem")]
-    partial class rename_ordereitem
+    [Migration("20251225182032_init")]
+    partial class init
     {
         /// <inheritdoc />
         protected override void BuildTargetModel(ModelBuilder modelBuilder)

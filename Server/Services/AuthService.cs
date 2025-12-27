@@ -1,6 +1,7 @@
 using Server.Models;
 using Server.Context;
 using Microsoft.EntityFrameworkCore;
+using static BCrypt.Net.BCrypt;
 
 namespace Server.Services;
 
@@ -29,6 +30,7 @@ public class AuthService : IAuthService
             {
                 return dbResults;
             }
+            account.Password = HashPassword(account.Password);
 
             _db.accounts.Add(account);
             await _db.SaveChangesAsync();

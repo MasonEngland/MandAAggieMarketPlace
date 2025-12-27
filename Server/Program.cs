@@ -12,7 +12,6 @@ using Server.Context;
 using Microsoft.EntityFrameworkCore;
 using Server.Middleware;
 using Stripe;
-using Stripe.Checkout;
 
 namespace Server;
 
@@ -41,7 +40,7 @@ public class Program
 
         var app = builder.Build();
 
-        // //! remove during deployment
+        //! remove during deployment
         app.UseCors(builder => {
             builder.AllowAnyOrigin();
             builder.AllowAnyMethod();

@@ -68,10 +68,6 @@ public class CommerceService : ICommerceService
 
     public async Task<(bool Success, Item? dbItem)> Purchase(Account account, Item item, string address)
     {
-        if (account.Balance - item.Price < 0)
-        {
-            return (false, null);
-        }
 
         Item? dbItem = await _db.CurrentStock.FirstOrDefaultAsync(h => h.Id == item.Id);
         if (dbItem == null)
@@ -79,16 +75,8 @@ public class CommerceService : ICommerceService
             return (false, null);
         }
 
-        if (item.Stock > dbItem.Stock || item.Stock == 0)
-        {
-            return (false, null);
-        }
-
         // lower the item stock by the amount requested
         dbItem.Stock -= item.Stock;
-
-        await _db.accounts.Where(h => h.Id == account.Id)
-            .ExecuteUpdateAsync(setter => setter.SetProperty(b => b.Balance, b => b.Balance - item.Price * item.Stock));
 
 
         _db.OrderQueue.Add(new Order()

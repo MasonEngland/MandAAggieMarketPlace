@@ -4,6 +4,6 @@ public interface ITransactionService
 {
     Task<object?> CreateCheckoutSession(double amount, Item[] items);
 
-    bool HandleCheckoutStatus(string sessionId);
+    Task<bool> HandleCheckoutStatus(string sessionId, string accountId, Item[] items, string address);
 
 }

@@ -10,5 +10,6 @@ public static class ServiceExtensions
         services.AddScoped<IAuthService, AuthService>();
         services.AddScoped<IAccountService, AccountService>();
         services.AddScoped<IShoppingCartService, ShoppingCartService>();
+        services.AddScoped<ITransactionService, TransactionService>();
     }
 }

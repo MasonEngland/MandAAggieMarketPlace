@@ -75,17 +75,29 @@ public class CommerceService : ICommerceService
             return (false, null);
         }
 
+        if (dbItem.Stock < item.Stock || item.Stock <= 0)
+        {
+            return (false, null);
+        }
+
         // lower the item stock by the amount requested
         dbItem.Stock -= item.Stock;
 
-
-        _db.OrderQueue.Add(new Order()
+        try
         {
-            OrderItem = dbItem,
-            OwnerId = Convert.ToString(account.Id)!,
-            Address = address,
-            Amount = item.Stock
-        });
+            _db.OrderQueue.Add(new Order()
+            {
+                OrderItem = dbItem,
+                OwnerId = Convert.ToString(account.Id)!,
+                Address = address,
+                Amount = item.Stock
+            }); 
+        } catch (Exception err)
+        {
+            Console.WriteLine(err.Message);
+            return (false, null);
+        }
+       
         await _db.SaveChangesAsync();
 
         return (true, dbItem);

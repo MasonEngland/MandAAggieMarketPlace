@@ -1,16 +1,19 @@
-using System.Data.Common;
 using Microsoft.EntityFrameworkCore;
 using Server.Context;
 using Server.Models;
 using Stripe.Checkout;
 
+namespace Server.Services;
+
 public class TransactionService : ITransactionService
 {
     private readonly DatabaseContext _db;
+    private readonly ICommerceService _commerceService;
 
-    public TransactionService(DatabaseContext db)
+    public TransactionService(DatabaseContext db, ICommerceService commerceService)
     {
         _db = db;
+        _commerceService = commerceService;
     }
 
     public async Task<object?> CreateCheckoutSession(double amount, Item[] items)
@@ -50,7 +53,7 @@ public class TransactionService : ITransactionService
             LineItems = lineItems,
             Mode = "payment",
             UiMode = "embedded",
-            ReturnUrl = $"{applicationUrl}/checkout-status?session_id={{CHECKOUT_SESSION_ID}}" // enter url to handle checkout status
+            ReturnUrl = $"localhost:2501/Checkout_Status?session_id={{CHECKOUT_SESSION_ID}}" // enter url to handle checkout status
 
         };
         var sessionService = new SessionService();
@@ -59,8 +62,34 @@ public class TransactionService : ITransactionService
 
     }
 
-    public bool HandleCheckoutStatus(string sessionId)
+    public async Task<bool> HandleCheckoutStatus(string sessionId, string accountId, Item[] items, string address)
     {
-        throw new NotImplementedException();
+        var sessionService = new SessionService();
+        Session session = sessionService.Get(sessionId);
+        Account account = _db.accounts.First(a => a.Id.ToString() == accountId);
+
+
+        if (session.PaymentStatus == "paid")
+        {
+            
+            using var transaction = await _db.Database.BeginTransactionAsync();
+            try
+            {
+                foreach (var item in items)
+                {
+                    (bool success, Item? item) result = await _commerceService.Purchase(account, item, address);
+
+                    if (!result.success) throw new InvalidOperationException("Purchase failed");
+                }
+                await transaction.CommitAsync();
+                return true;
+            }
+            catch
+            {
+                await transaction.RollbackAsync();
+                return false;
+            }
+        }
+        return false;
     }
 }

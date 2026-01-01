@@ -16,7 +16,7 @@ public class TransactionService : ITransactionService
         _commerceService = commerceService;
     }
 
-    public async Task<object?> CreateCheckoutSession(double amount, Item[] items)
+    public async Task<string?> CreateCheckoutSession(Item[] items)
     {
         string applicationUrl = Environment.GetEnvironmentVariable("APPLICATION_URL")!;
         List<SessionLineItemOptions> lineItems = new List<SessionLineItemOptions>();

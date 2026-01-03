@@ -1,6 +1,6 @@
 using JWT.Builder;
 using JWT.Algorithms;
-
+using System.Text.Json;
 
 namespace Server.Middleware;
 
@@ -44,6 +44,27 @@ public class AuthToken : IMiddleware
                 return;
             }
 
+            IDictionary<string, object?>? decodedDict = JsonSerializer.Deserialize<Dictionary<string, object?>>(decoded);
+            if (decodedDict == null || !decodedDict.ContainsKey("Id"))
+            {
+                await context.Response.WriteAsync("token invalid");
+                context.Response.StatusCode = 401;
+                return;
+            }
+
+            // check expiration
+            if (decodedDict.ContainsKey("exp"))
+            {
+                long exp = Convert.ToInt64(decodedDict["exp"]);
+                DateTimeOffset expDate = DateTimeOffset.FromUnixTimeSeconds(exp);
+                if (expDate < DateTimeOffset.UtcNow) 
+                {
+                    context.Response.StatusCode = 401;
+                    await context.Response.WriteAsync("token expired");
+                    return;
+                }
+            }
+
             IDictionary<object, object?> item = new Dictionary<object, object?>
             {
                 {"tokenData", decoded}
@@ -53,8 +74,8 @@ public class AuthToken : IMiddleware
             await next(context);
         } catch (Exception err)
         {
-            System.Console.WriteLine(err.Message);
-            context.Response.StatusCode = 500;
+            Console.WriteLine(err.Message);
+            context.Response.StatusCode = 401;
             return;
         }
     }

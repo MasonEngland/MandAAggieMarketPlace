@@ -2,6 +2,7 @@ using Microsoft.EntityFrameworkCore;
 using Server.Context;
 using Server.Models;
 using Stripe.Checkout;
+using Stripe;
 
 namespace Server.Services;
 
@@ -66,30 +67,49 @@ public class TransactionService : ITransactionService
     {
         var sessionService = new SessionService();
         Session session = sessionService.Get(sessionId);
-        Account account = _db.accounts.First(a => a.Id.ToString() == accountId);
+        Models.Account account = _db.accounts.First(a => a.Id.ToString() == accountId);
 
 
-        if (session.PaymentStatus == "paid")
+        if (session.PaymentStatus != "paid")
         {
+            return false;
+        }
             
-            using var transaction = await _db.Database.BeginTransactionAsync();
+        using var transaction = await _db.Database.BeginTransactionAsync();
+        try
+        {
+            foreach (var item in items)
+            {
+                (bool success, Item? item) result = await _commerceService.Purchase(account, item, address);
+
+                if (!result.success) throw new InvalidOperationException("Purchase failed");
+            }
+            await transaction.CommitAsync();
+            return true;
+        }
+        catch
+        {
+            await transaction.RollbackAsync();
+            
+            // Issue refund since payment was processed but DB update failed
             try
             {
-                foreach (var item in items)
+                var refundService = new RefundService();
+                var refundOptions = new RefundCreateOptions
                 {
-                    (bool success, Item? item) result = await _commerceService.Purchase(account, item, address);
-
-                    if (!result.success) throw new InvalidOperationException("Purchase failed");
-                }
-                await transaction.CommitAsync();
-                return true;
+                    PaymentIntent = session.PaymentIntentId,
+                };
+                Refund refund = refundService.Create(refundOptions);
+                // Optionally log refund.Id or handle success
             }
-            catch
+            catch (Exception refundEx)
             {
-                await transaction.RollbackAsync();
-                return false;
+                // Log refund failure - may need manual intervention
+                Console.WriteLine($"Refund failed for session {sessionId}: {refundEx.Message}");
+                //TODO: possibly send alert to admin for manual intervention
             }
+            
+            return false;
         }
-        return false;
     }
 }

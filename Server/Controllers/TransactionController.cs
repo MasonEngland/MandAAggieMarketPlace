@@ -3,7 +3,6 @@ using Server.Services;
 using Server.Context;
 using Server.Models;
 using Server.Util;
-using Microsoft.EntityFrameworkCore;
 
 namespace Server.Controllers;
 
@@ -12,17 +11,15 @@ namespace Server.Controllers;
 public class TransactionController : Controller
 {
     private readonly ITransactionService _transactionService;
-    private readonly DatabaseContext _db;
 
-    public TransactionController(TransactionService transactionService, DatabaseContext db)
+    public TransactionController(TransactionService transactionService)
     {
-        _db = db;
         _transactionService = transactionService;
         
     }
 
     [HttpPost("Checkout")]
-    public async Task<IActionResult> CreateCheckoutSession([FromBody] string[] itemIds)
+    public async Task<IActionResult> CreateCheckoutSession([FromBody] Item[] items)
     {
         Account? account = AccountUtilities.GetAccount(HttpContext);
         if (account == null)
@@ -30,27 +27,30 @@ public class TransactionController : Controller
             return Unauthorized(new {success = false, message = "could not authenticate"});
         }
 
-        Item[] dbItems = new Item[itemIds.Length];
-        for (int i = 0; i < itemIds.Length; i++)
-        {
-            Item item = await _db.CurrentStock.Where(h => h.Id.ToString() == itemIds[i]).FirstAsync();
-            dbItems[i] = item;
-        }
-
-        string? clientSecret = await _transactionService.CreateCheckoutSession(dbItems);
+        string? clientSecret = await _transactionService.CreateCheckoutSession(items);
 
         if (clientSecret == null)
         {
-            return StatusCode(500);
+            return StatusCode(500, new {success = false, message = "could not create checkout session"});
         }
 
-        return Ok(new {success = true, clientSecret, dbItems});
+        return Ok(new {success = true, clientSecret, items});
     }
 
-    [HttpGet("CheckoutStatus")]
-    public IActionResult HandleCheckoutStatus()
+    [HttpPost("CheckoutStatus")]
+    public async Task<IActionResult> HandleCheckoutStatus([FromBody] CheckoutStatusRequest request)
     {
-        return Ok();
-    }
+        Account? account = AccountUtilities.GetAccount(HttpContext);
+        if (account is null)
+        {
+            return Unauthorized(new {success = false, message = "could not find account"});
+        }
 
+        bool success = await _transactionService.HandleCheckoutStatus(request.SessionId, account.Id.ToString(), request.Items, request.Address);
+        if (!success)
+        {
+            return StatusCode(500, new { success = false, message = "could not process checkout status" });
+        }
+        return Ok(new { success = true });
+    }
 }

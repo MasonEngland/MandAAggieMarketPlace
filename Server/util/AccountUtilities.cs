@@ -21,11 +21,13 @@ public static class AccountUtilities
             return null;
         }
 
-        Account? account = JsonSerializer.Deserialize<Account>(data!);
+        Account? account = JsonSerializer.Deserialize<Account>(data);
         if (account == null)
         {
             return null;
         }
+
+
         return account;
     }
 
@@ -42,6 +44,7 @@ public static class AccountUtilities
             .AddClaim("LastName", account.LastName)
             .AddClaim("Admin", account.Admin)
             .AddClaim("Balance", account.Balance)
+            .AddClaim("exp", DateTimeOffset.UtcNow.AddDays(7).ToUnixTimeSeconds())
             .Encode();
 
         return token;

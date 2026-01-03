@@ -26,6 +26,7 @@ export default function Topbar(props) {
 
     // check if user is logged in and change account section accordingly
     useEffect(() => {
+        console.log(user.authenticated);
         if (user.authenticated) {
             let email = user.email;
             

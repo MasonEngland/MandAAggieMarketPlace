@@ -53,9 +53,8 @@ public class AuthToken : IMiddleware
             }
 
             // check expiration
-            if (decodedDict.ContainsKey("exp"))
+            if (decodedDict.ContainsKey("exp") && decodedDict["exp"] is JsonElement expElement && expElement.TryGetInt64(out long exp))
             {
-                long exp = Convert.ToInt64(decodedDict["exp"]);
                 DateTimeOffset expDate = DateTimeOffset.FromUnixTimeSeconds(exp);
                 if (expDate < DateTimeOffset.UtcNow) 
                 {
@@ -64,6 +63,7 @@ public class AuthToken : IMiddleware
                     return;
                 }
             }
+            
 
             IDictionary<object, object?> item = new Dictionary<object, object?>
             {

@@ -59,8 +59,7 @@ public class TransactionService : ITransactionService
         };
         var sessionService = new SessionService();
         Session session = sessionService.Create(sessionoptions);
-        return session.ClientSecret;
-
+        return session.Id;
     }
 
     public async Task<bool> HandleCheckoutStatus(string sessionId, string accountId, Item[] items, string address)
@@ -111,5 +110,12 @@ public class TransactionService : ITransactionService
             
             return false;
         }
+    }
+
+    public async Task<string?> GetSecret(string sessionId)
+    {
+        var sessionService = new SessionService();
+        Session session = sessionService.Get(sessionId);
+        return session.ClientSecret;
     }
 }

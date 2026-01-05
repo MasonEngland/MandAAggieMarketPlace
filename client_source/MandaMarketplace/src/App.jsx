@@ -14,6 +14,7 @@ import AuthContext from './context/authContext';
 import verifyAccount from './util/verifyAccount';
 import { Navigate } from 'react-router';
 import 'material-symbols';
+import Checkout from './Pages/checkout';
 
 function App() {
   let [user, setUser] = useState({authenticated: false});
@@ -56,6 +57,7 @@ function App() {
           <Route path="/addfunds" element={<PrivateRoute><AddFunds /></PrivateRoute>} />
           <Route path="/changepassword" element={<PrivateRoute><ChangePassword /></PrivateRoute>} />
           <Route path="/cart" element={<PrivateRoute><CartPage /></PrivateRoute>} />
+          <Route path="/checkout" element={<PrivateRoute><Checkout /></PrivateRoute>} />
         </Routes>
       </BrowserRouter>
     </AuthContext.Provider>

@@ -1,6 +1,5 @@
 using Microsoft.AspNetCore.Mvc;
 using Server.Services;
-using Server.Context;
 using Server.Models;
 using Server.Util;
 
@@ -27,14 +26,14 @@ public class TransactionController : Controller
             return Unauthorized(new {success = false, message = "could not authenticate"});
         }
 
-        string? clientSecret = await _transactionService.CreateCheckoutSession(items);
+        string? sessionId = await _transactionService.CreateCheckoutSession(items);
 
-        if (clientSecret == null)
+        if (sessionId == null)
         {
             return StatusCode(500, new {success = false, message = "could not create checkout session"});
         }
 
-        return Ok(new {success = true, clientSecret, items});
+        return Ok(new {success = true, sessionId, items});
     }
 
     [HttpPost("CheckoutStatus")]
@@ -52,5 +51,23 @@ public class TransactionController : Controller
             return StatusCode(500, new { success = false, message = "could not process checkout status" });
         }
         return Ok(new { success = true });
+    }
+
+    [HttpGet("GetSecret/{sessionId}")]
+    public async Task<IActionResult> GetSecret(string sessionId)
+    {
+        Account? account = AccountUtilities.GetAccount(HttpContext);
+        if (account is null)
+        {
+            return Unauthorized(new { success = false, message = "could not find account" });
+        }
+
+        string? secret = await _transactionService.GetSecret(sessionId);
+        if (secret == null)
+        {
+            return StatusCode(500, new { success = false, message = "could not retrieve secret" });
+        }
+
+        return Ok(new { success = true, secret });
     }
 }

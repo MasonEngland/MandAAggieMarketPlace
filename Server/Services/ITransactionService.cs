@@ -6,4 +6,6 @@ public interface ITransactionService
 
     Task<bool> HandleCheckoutStatus(string sessionId, string accountId, Item[] items, string address);
 
+    Task<string?> GetSecret(string sessionId);
+
 }

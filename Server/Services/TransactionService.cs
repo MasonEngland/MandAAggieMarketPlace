@@ -64,7 +64,7 @@ public class TransactionService : ITransactionService
 
     public async Task<bool> HandleCheckoutStatus(string sessionId, string accountId, Item[] items, string address)
     {
-        var sessionService = new SessionService();
+        SessionService sessionService = new SessionService();
         Session session = sessionService.Get(sessionId);
         Models.Account account = _db.accounts.First(a => a.Id.ToString() == accountId);
 

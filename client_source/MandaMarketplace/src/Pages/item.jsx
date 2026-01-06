@@ -29,6 +29,7 @@ export default function Item(props) {
         axios.get(`${serverUrl}/Api/Commerce/GetItem/${id}`)
         .then(res => {
             if (res.data.success === true) {
+                console.log(res.data.item);
                 setItem(res.data.item);
             }
             else {
@@ -65,6 +66,11 @@ export default function Item(props) {
 
         else if (!id || id === '') {
             location.href = '/';
+        }
+
+        if (quantity > item.stock) {
+            alert('Quantity exceeds stock');
+            return;
         }
 
         item.stock = quantity;
@@ -147,7 +153,7 @@ export default function Item(props) {
                         </span>
                     <span>Recieve within 10 days</span>
                     <span className={styles.inputContainer}>
-                        <input type="number" placeholder="Quantity" className={styles.input} onChange={(e) => setQuantity(e.target.value)}/>
+                        <input type="number" placeholder="Quantity" className={styles.input} onChange={(e) => setQuantity(parseInt(e.target.value) || 0)}/>
                         <input type="text" placeholder="Address" className={styles.input} value={address} onChange={(e) => setAddress(e.target.value)}/>
                     </span>
                     <button className ={styles.button} style={{cursor: 'pointer'}} onClick={() => addToCart()}>Add to Cart</button>

@@ -54,7 +54,7 @@ public class TransactionService : ITransactionService
             LineItems = lineItems,
             Mode = "payment",
             UiMode = "embedded",
-            ReturnUrl = $"localhost:2501/Checkout_Status?session_id={{CHECKOUT_SESSION_ID}}" // enter url to handle checkout status
+            ReturnUrl = $"{applicationUrl}" // enter url to handle checkout status
 
         };
         var sessionService = new SessionService();

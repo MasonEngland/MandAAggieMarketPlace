@@ -49,7 +49,6 @@ public class Program
 
         app.UseAuthorization();
         
-
         app.UseStaticFiles();
 
         app.UseAuthToken();

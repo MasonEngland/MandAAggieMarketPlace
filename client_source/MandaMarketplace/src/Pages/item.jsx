@@ -29,7 +29,6 @@ export default function Item(props) {
         axios.get(`${serverUrl}/Api/Commerce/GetItem/${id}`)
         .then(res => {
             if (res.data.success === true) {
-                console.log(res.data.item);
                 setItem(res.data.item);
             }
             else {
@@ -77,17 +76,15 @@ export default function Item(props) {
 
 
         // make request to database
-        axios.post(`${serverUrl}/Api/Commerce/Purchase/${address}`, {
-            ...item
-        }, {
+        axios.post(`${serverUrl}/Api/Transactions/Checkout`, [item], {
             headers: {
                 'Authorization': `Bearer ${token}`
             }
         })
         .then(res => {
+            console.log(res);
             if (res.data.success === true) {
-                alert(res.data.message);
-                location.href = '/';
+                location.href = '/checkout?session_id=' + res.data.sessionId + '&address=' + address;
             }
             else {
                 alert(res.data.message);

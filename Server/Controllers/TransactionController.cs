@@ -1,5 +1,4 @@
 using Microsoft.AspNetCore.Mvc;
-using Server.Services;
 using Server.Models;
 using Server.Util;
 
@@ -11,7 +10,7 @@ public class TransactionController : Controller
 {
     private readonly ITransactionService _transactionService;
 
-    public TransactionController(TransactionService transactionService)
+    public TransactionController(ITransactionService transactionService)
     {
         _transactionService = transactionService;
         

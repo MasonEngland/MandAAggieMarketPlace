@@ -76,7 +76,7 @@ export default function Item(props) {
 
 
         // make request to database
-        axios.post(`${serverUrl}/Api/Transactions/Checkout`, [item], {
+        axios.post(`${serverUrl}/Api/Transactions/Checkout`, item, {
             headers: {
                 'Authorization': `Bearer ${token}`
             }

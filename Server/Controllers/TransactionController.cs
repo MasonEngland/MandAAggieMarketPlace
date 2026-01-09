@@ -17,7 +17,7 @@ public class TransactionController : Controller
     }
 
     [HttpPost("Checkout")]
-    public async Task<IActionResult> CreateCheckoutSession([FromBody] Item[] items)
+    public async Task<IActionResult> CreateCheckoutSession([FromBody] Item item)
     {
         Account? account = AccountUtilities.GetAccount(HttpContext);
         if (account == null)
@@ -25,14 +25,14 @@ public class TransactionController : Controller
             return Unauthorized(new {success = false, message = "could not authenticate"});
         }
 
-        string? sessionId = await _transactionService.CreateCheckoutSession(items);
+        string? sessionId = await _transactionService.CreateCheckoutSession(item);
 
         if (sessionId == null)
         {
             return StatusCode(500, new {success = false, message = "could not create checkout session"});
         }
 
-        return Ok(new {success = true, sessionId, items});
+        return Ok(new {success = true, sessionId, item});
     }
 
     [HttpPost("CheckoutStatus")]

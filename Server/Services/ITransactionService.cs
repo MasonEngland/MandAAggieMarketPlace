@@ -2,7 +2,7 @@ using Server.Models;
 
 public interface ITransactionService
 {
-    Task<string?> CreateCheckoutSession(Item[] items);
+    Task<string?> CreateCheckoutSession(Item item);
 
     Task<bool> HandleCheckoutStatus(string sessionId, string accountId, Item[] items, string address);
 

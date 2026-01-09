@@ -17,44 +17,47 @@ public class TransactionService : ITransactionService
         _commerceService = commerceService;
     }
 
-    public async Task<string?> CreateCheckoutSession(Item[] items)
+    public async Task<string?> CreateCheckoutSession(Item item)
     {
         string applicationUrl = Environment.GetEnvironmentVariable("APPLICATION_URL")!;
         List<SessionLineItemOptions> lineItems = new List<SessionLineItemOptions>();
 
 
-        for (int i = 0; i< items.Length; i++)
+        
+        Item dbItem = await _db.CurrentStock.FirstAsync(h => h.Id == item.Id);
+
+        if (dbItem.Stock < item.Stock || item.Stock <= 0)
         {
-            Item item = items[i];
-            Item dbItem = await _db.CurrentStock.FirstAsync(h => h.Id == item.Id);
-
-            if (dbItem.Stock < item.Stock || item.Stock <= 0)
-            {
-                return null;
-            }
-
-            lineItems.Add(new SessionLineItemOptions
-            {
-                PriceData = new SessionLineItemPriceDataOptions
-                {
-                    UnitAmount = (long)(item.Price * 100),
-                    Currency = "usd",
-                    ProductData = new SessionLineItemPriceDataProductDataOptions
-                    {
-                        Name = item.Name,
-                        Description = item.Description,
-                    },
-                },
-                Quantity = item.Stock,
-            });
+            return null;
         }
+
+        lineItems.Add(new SessionLineItemOptions
+        {
+            PriceData = new SessionLineItemPriceDataOptions
+            {
+                UnitAmount = (long)(item.Price * 100),
+                Currency = "usd",
+                ProductData = new SessionLineItemPriceDataProductDataOptions
+                {
+                    Name = item.Name,
+                    Description = item.Description,
+                },
+            },
+            Quantity = item.Stock,
+        });
+        
+
 
         var sessionoptions = new SessionCreateOptions
         {
             LineItems = lineItems,
             Mode = "payment",
             UiMode = "embedded",
-            ReturnUrl = $"{applicationUrl}" // enter url to handle checkout status
+            ReturnUrl = $"{applicationUrl}", // enter url to handle checkout status
+            Metadata = new Dictionary<string, string>
+            {
+                { "itemId", item.Id.ToString() },
+            },
 
         };
         var sessionService = new SessionService();

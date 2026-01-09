@@ -44,7 +44,7 @@ public class TransactionController : Controller
             return Unauthorized(new {success = false, message = "could not find account"});
         }
 
-        bool success = await _transactionService.HandleCheckoutStatus(request.SessionId, account.Id.ToString(), request.Items, request.Address);
+        bool success = await _transactionService.HandleCheckoutStatus(request.SessionId, account.Id.ToString(), request.Address);
         if (!success)
         {
             return StatusCode(500, new { success = false, message = "could not process checkout status" });

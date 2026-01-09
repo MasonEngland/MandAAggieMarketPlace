@@ -4,7 +4,7 @@ public interface ITransactionService
 {
     Task<string?> CreateCheckoutSession(Item item);
 
-    Task<bool> HandleCheckoutStatus(string sessionId, string accountId, Item[] items, string address);
+    Task<bool> HandleCheckoutStatus(string sessionId, string accountId, string address);
 
     Task<string?> GetSecret(string sessionId);
 

@@ -12,5 +12,4 @@ public class CheckoutStatusRequest
         public string SessionId { get; set; } = null!;
         public string Address { get; set; } = null!;
 
-        public Item[] Items { get; set; } = null!;
     }

@@ -65,11 +65,13 @@ public class TransactionService : ITransactionService
         return session.Id;
     }
 
-    public async Task<bool> HandleCheckoutStatus(string sessionId, string accountId, Item[] items, string address)
+    public async Task<bool> HandleCheckoutStatus(string sessionId, string accountId, string address)
     {
         SessionService sessionService = new SessionService();
         Session session = sessionService.Get(sessionId);
         Models.Account account = _db.accounts.First(a => a.Id.ToString() == accountId);
+        string itemId = session.Metadata["itemId"];
+        Item item = await _db.CurrentStock.FirstAsync(h => h.Id.ToString() == itemId);
 
 
         if (session.PaymentStatus != "paid")
@@ -80,12 +82,12 @@ public class TransactionService : ITransactionService
         using var transaction = await _db.Database.BeginTransactionAsync();
         try
         {
-            foreach (var item in items)
-            {
-                (bool success, Item? item) result = await _commerceService.Purchase(account, item, address);
+            
+            
+            (bool success, Item? item) result = await _commerceService.Purchase(account, item, address);
 
-                if (!result.success) throw new InvalidOperationException("Purchase failed");
-            }
+            if (!result.success) throw new InvalidOperationException("Purchase failed");
+
             await transaction.CommitAsync();
             return true;
         }

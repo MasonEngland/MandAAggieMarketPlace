@@ -17,7 +17,7 @@ public class TransactionService : ITransactionService
         _commerceService = commerceService;
     }
 
-    public async Task<string?> CreateCheckoutSession(Item item)
+    public async Task<string?> CreateCheckoutSession(Item item, string address)
     {
         string applicationUrl = Environment.GetEnvironmentVariable("APPLICATION_URL")!;
         List<SessionLineItemOptions> lineItems = new List<SessionLineItemOptions>();
@@ -46,14 +46,13 @@ public class TransactionService : ITransactionService
             Quantity = item.Stock,
         });
         
-
-
+        // create the stripe checkout session
         var sessionoptions = new SessionCreateOptions
         {
             LineItems = lineItems,
             Mode = "payment",
             UiMode = "embedded",
-            ReturnUrl = $"{applicationUrl}", // enter url to handle checkout status
+            ReturnUrl = $"{applicationUrl}/status?session_id={{CHECKOUT_SESSION_ID}}&address={address}",
             Metadata = new Dictionary<string, string>
             {
                 { "itemId", item.Id.ToString() },
@@ -67,18 +66,69 @@ public class TransactionService : ITransactionService
 
     public async Task<bool> HandleCheckoutStatus(string sessionId, string accountId, string address)
     {
-        SessionService sessionService = new SessionService();
-        Session session = sessionService.Get(sessionId);
-        Models.Account account = _db.accounts.First(a => a.Id.ToString() == accountId);
-        string itemId = session.Metadata["itemId"];
-        Item item = await _db.CurrentStock.FirstAsync(h => h.Id.ToString() == itemId);
-
-
-        if (session.PaymentStatus != "paid")
+        try
         {
+            
+        
+            SessionService sessionService = new SessionService();
+            var options = new SessionGetOptions
+            {
+                Expand = new List<string> { "line_items" },
+            };
+            Session session = sessionService.Get(sessionId, options);
+            Console.WriteLine("Retrieved session: " + session.Id);
+            Models.Account account = _db.accounts.First(a => a.Id.ToString() == accountId);
+
+            if (session.PaymentStatus != "paid")
+            {
+                return false;
+            }
+
+            string? itemId = session.Metadata.TryGetValue("itemId", out var value) ? value : null;
+
+
+            if (itemId == null) return false;
+            
+
+
+            Item dbItem = await _db.CurrentStock.FirstAsync(h => h.Id.ToString() == itemId);
+
+            long? quantity = session.LineItems.Data[0].Quantity;
+            if (quantity == null) return false;
+            Item purchaseItem = new Item
+            {
+                Id = dbItem.Id,
+                Name = dbItem.Name,
+                Description = dbItem.Description,
+                Price = dbItem.Price,
+                Stock = (int)quantity,
+                Date = dbItem.Date,
+                ImageLink = dbItem.ImageLink,
+                Category = dbItem.Category,
+            };
+
+            return await ProcessPurchase(account, purchaseItem, address, session, sessionId);
+        } catch (Exception ex)
+        {
+            Console.WriteLine("Error in HandleCheckoutStatus: " + ex.Message);
+            Console.WriteLine(ex.StackTrace);
             return false;
         }
-            
+
+        
+
+        
+    }
+
+    public async Task<string?> GetSecret(string sessionId)
+    {
+        var sessionService = new SessionService();
+        Session session = sessionService.Get(sessionId);
+        return session.ClientSecret;
+    }
+
+    private async Task<bool> ProcessPurchase(Models.Account account, Item item, string address, Session session, string sessionId) 
+    {
         using var transaction = await _db.Database.BeginTransactionAsync();
         try
         {
@@ -86,7 +136,7 @@ public class TransactionService : ITransactionService
             
             (bool success, Item? item) result = await _commerceService.Purchase(account, item, address);
 
-            if (!result.success) throw new InvalidOperationException("Purchase failed");
+            if (!result.success) return false;
 
             await transaction.CommitAsync();
             return true;
@@ -103,8 +153,13 @@ public class TransactionService : ITransactionService
                 {
                     PaymentIntent = session.PaymentIntentId,
                 };
-                Refund refund = refundService.Create(refundOptions);
-                // Optionally log refund.Id or handle success
+                Refund refund = await refundService.CreateAsync(refundOptions);
+                // check if refund was successful
+                if (refund.Status != "succeeded")
+                {
+                    Console.WriteLine($"Refund failed for session {sessionId}: Status {refund.Status}");
+                    return false;
+                }
             }
             catch (Exception refundEx)
             {
@@ -115,12 +170,5 @@ public class TransactionService : ITransactionService
             
             return false;
         }
-    }
-
-    public async Task<string?> GetSecret(string sessionId)
-    {
-        var sessionService = new SessionService();
-        Session session = sessionService.Get(sessionId);
-        return session.ClientSecret;
     }
 }

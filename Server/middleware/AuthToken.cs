@@ -74,7 +74,8 @@ public class AuthToken : IMiddleware
             await next(context);
         } catch (Exception err)
         {
-            Console.WriteLine(err.Message);
+            Console.WriteLine("error at auth middleware: " + err.Message);
+            Console.WriteLine(err.StackTrace);
             context.Response.StatusCode = 401;
             return;
         }

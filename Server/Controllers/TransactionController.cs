@@ -16,8 +16,8 @@ public class TransactionController : Controller
         
     }
 
-    [HttpPost("Checkout")]
-    public async Task<IActionResult> CreateCheckoutSession([FromBody] Item item)
+    [HttpPost("Checkout/{address}")]
+    public async Task<IActionResult> CreateCheckoutSession([FromBody] Item item, string address)
     {
         Account? account = AccountUtilities.GetAccount(HttpContext);
         if (account == null)
@@ -25,7 +25,7 @@ public class TransactionController : Controller
             return Unauthorized(new {success = false, message = "could not authenticate"});
         }
 
-        string? sessionId = await _transactionService.CreateCheckoutSession(item);
+        string? sessionId = await _transactionService.CreateCheckoutSession(item, address);
 
         if (sessionId == null)
         {
@@ -41,13 +41,14 @@ public class TransactionController : Controller
         Account? account = AccountUtilities.GetAccount(HttpContext);
         if (account is null)
         {
+            Console.WriteLine("Could not find account in HandleCheckoutStatus");
             return Unauthorized(new {success = false, message = "could not find account"});
         }
 
         bool success = await _transactionService.HandleCheckoutStatus(request.SessionId, account.Id.ToString(), request.Address);
         if (!success)
         {
-            return StatusCode(500, new { success = false, message = "could not process checkout status" });
+            return StatusCode(400, new { success = false, message = "checkout status was not successful" });
         }
         return Ok(new { success = true });
     }

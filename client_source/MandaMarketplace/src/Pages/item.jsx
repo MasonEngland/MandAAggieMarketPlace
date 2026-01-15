@@ -1,4 +1,4 @@
-import Topbar from '../Components/topbar';
+import Topbar from '../Components/Topbar';
 import styles from '../css/item.module.css';
 import { useState, useEffect, useContext } from 'react';
 import { useSearchParams, useNavigate } from 'react-router';
@@ -58,7 +58,7 @@ export default function Item(props) {
         //validate item
         const id = item.id;
 
-        if (address === '' || quantity === 0) {
+        if (address === '' || quantity <= 0) {
             alert('Please enter an address and quantity');
             return;
         }
@@ -76,7 +76,7 @@ export default function Item(props) {
 
 
         // make request to database
-        axios.post(`${serverUrl}/Api/Transactions/Checkout`, item, {
+        axios.post(`${serverUrl}/Api/Transactions/Checkout/${address}`, item, {
             headers: {
                 'Authorization': `Bearer ${token}`
             }

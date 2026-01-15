@@ -31,7 +31,7 @@ export default function Topbar(props) {
             
             const ddOptions = [
                 <Link to="/settings" className={styles.a}>Account</Link>,
-                "View Order Status",
+                <Link to="/orders" className={styles.a}>View Order Status</Link>,
                 <Link to="/cart" className={styles.a}>Go To Cart</Link>
             ]
             setAccountSection(

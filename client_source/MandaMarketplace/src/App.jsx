@@ -16,6 +16,7 @@ import { Navigate } from 'react-router';
 import 'material-symbols';
 import Checkout from './Pages/checkout';
 import Status from './Pages/status';
+import Orders from './Pages/orders';
 
 function App() {
   let [user, setUser] = useState({authenticated: false});
@@ -60,6 +61,7 @@ function App() {
           <Route path="/cart" element={<PrivateRoute><CartPage /></PrivateRoute>} />
           <Route path="/checkout" element={<PrivateRoute><Checkout /></PrivateRoute>} />
           <Route path="/status" element={<PrivateRoute><Status /></PrivateRoute>} />
+          <Route path="/orders" element={<PrivateRoute><Orders /></PrivateRoute>} />
         </Routes>
       </BrowserRouter>
     </AuthContext.Provider>

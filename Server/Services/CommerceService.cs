@@ -157,4 +157,22 @@ public class CommerceService : ICommerceService
             return Array.Empty<Item>();
         }
     }
+
+    public async Task<Order[]> GetOrders(string accountId)
+    {
+        try
+        {
+            Order[] orders = await _db.OrderQueue
+                .Where(o => o.OwnerId == accountId)
+                .Include(o => o.OrderItem)
+                .ToArrayAsync();
+
+            return orders;
+        }
+        catch (Exception err)
+        {
+            Console.WriteLine(err.Message);
+            return Array.Empty<Order>();
+        }
+    }
 }

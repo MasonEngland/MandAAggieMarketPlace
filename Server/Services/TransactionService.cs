@@ -114,10 +114,6 @@ public class TransactionService : ITransactionService
             Console.WriteLine(ex.StackTrace);
             return false;
         }
-
-        
-
-        
     }
 
     public async Task<string?> GetSecret(string sessionId)

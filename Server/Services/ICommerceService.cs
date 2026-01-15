@@ -9,4 +9,6 @@ public interface ICommerceService
     Task<Item?> GetItem(string id);
 
     Task<Item[]> GetItemsBySearch(string searchTerm, int page = 1, int pageSize = 10);
+
+    Task<Order[]> GetOrders(string accountId);
 }

@@ -188,6 +188,39 @@ public class CommerceController : Controller
         
     }
 
+    [HttpGet("GetOrders")]
+    public async Task<IActionResult> GetOrders()
+    {
+        Account? account = GetAccount(HttpContext);
+        if (account == null)
+        {
+            return Unauthorized(new
+            {
+                success = false,
+                message = "could not authenticate"
+            });
+        }
+
+        try
+        {
+            Order[] orders = await _commerceService.GetOrders(account.Id.ToString());
+            return Ok(new
+            {
+                orders,
+                success = true
+            });
+        }
+        catch (Exception err)
+        {
+            Console.WriteLine(err.Message);
+            return StatusCode(500, new
+            {
+                success = false,
+                message = "Error retrieving orders"
+            });
+        }
+    }
+
     //! this code is there to stock the database using fakestore API
     //! do not delete and only uncomment for use
     // [HttpGet("StockDb/GetStock")]

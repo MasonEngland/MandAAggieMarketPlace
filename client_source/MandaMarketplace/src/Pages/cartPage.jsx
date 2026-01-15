@@ -1,4 +1,4 @@
-import TopBar from "../Components/TopBar";
+import TopBar from "../Components/Topbar";
 import HorizontalCard from "../Components/horizontalcard";
 import { useEffect, useState } from "react";
 import {useNavigate} from "react-router";

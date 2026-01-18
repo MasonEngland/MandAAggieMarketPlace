@@ -1,13 +1,17 @@
 import TopBar from "../Components/Topbar";
 import HorizontalCard from "../Components/horizontalcard";
-import { useEffect, useState } from "react";
+import { useContext, useEffect, useState } from "react";
 import {useNavigate} from "react-router";
 import serverUrl from "../util/serverurl";
 import Cookies from "js-cookie";
+import AuthContext from "../context/authContext";
+import axios from "axios";
+
 
 export default function cartPage() {
     const [items, setItems] = useState([]);
     const navigate = useNavigate();
+    const user = useContext(AuthContext);
 
 
     const getCartItems = async () => {
@@ -48,6 +52,8 @@ export default function cartPage() {
         alert("failed to remove cart item: \n");
     }
 
+    
+
 
     useEffect(() => {
        getCartItems();
@@ -55,14 +61,23 @@ export default function cartPage() {
 
     return (
         <>
-        <TopBar />
-        <div className="container" style={{marginTop: "15px"}}>
-            {items.length === 0 ? (
-                <h2>Your cart is empty.</h2>
-            ) : (
-                items.map((item, index) => (<HorizontalCard key={index} item={item} onRemove={() => removeFromCart(item.id)}></HorizontalCard>))
-            )}
-        </div>
+            <TopBar />
+            <div className="container" style={{marginTop: "15px"}}>
+                {items.length === 0 ? (
+                    <h2>Your cart is empty.</h2>
+                ) : (
+                    items.map(
+                        (item, index) => (
+                            <HorizontalCard 
+                                key={index} 
+                                item={item} 
+                                onRemove={() => removeFromCart(item.id)} 
+                                onButton={() => navigate(`/item?item=${item.id}`)}>
+                            </HorizontalCard>
+                        )
+                    )
+                )}
+            </div>
         </>
     )
 }

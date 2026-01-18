@@ -12,7 +12,7 @@ export default function Item(props) {
     // define state variables
     const [item, setItem] = useState({});
     const [searchParams] = useSearchParams();
-    const [quantity, setQuantity] = useState(0);
+    const [quantity, setQuantity] = useState(1);
     const [address, setAddress] = useState('');
     const navigate = useNavigate();
     const user = useContext(AuthContext);
@@ -150,7 +150,7 @@ export default function Item(props) {
                         </span>
                     <span>Recieve within 10 days</span>
                     <span className={styles.inputContainer}>
-                        <input type="number" placeholder="Quantity" className={styles.input} onChange={(e) => setQuantity(parseInt(e.target.value) || 0)}/>
+                        <input type="number" placeholder="Quantity" className={styles.input} value={quantity} onChange={(e) => e.target.value > 0 ? setQuantity(parseInt(e.target.value)) : setQuantity(1)}/>
                         <input type="text" placeholder="Address" className={styles.input} value={address} onChange={(e) => setAddress(e.target.value)}/>
                     </span>
                     <button className ={styles.button} style={{cursor: 'pointer'}} onClick={() => addToCart()}>Add to Cart</button>

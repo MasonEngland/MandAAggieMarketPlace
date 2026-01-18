@@ -45,7 +45,7 @@ export default function Login() {
         <div className={styles.container}>
             <form className={styles.form}>
                 <img className={styles.logo} src={USU_logo} alt="Logo" />
-                <h3>MandA Aggie Marketplace</h3>
+                <h3>MandA Marketplace</h3>
                 <h2>Login</h2>
                 <input className={styles.input} type="text" placeholder="Email" onChange={(e) => setEmail(e.target.value)}/>
                 <input className={styles.input} type="password" placeholder="Password" onChange={(e) => setPassword(e.target.value)}/>

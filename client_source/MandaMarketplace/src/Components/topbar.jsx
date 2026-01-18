@@ -54,7 +54,7 @@ export default function Topbar(props) {
         <header className={styles.header}>
             <nav className={styles.nav}>
                 <img id="logo" src={USU_logo} alt="USU Logo" className={styles.img} />
-                <span className={styles.span} id ="title">MandA Aggie Marketplace</span>
+                <span className={styles.span} id ="title">MandA Marketplace</span>
                 {navitems}
                 <input type="text" placeholder="Search" className={styles.input} value={search} onChange={e => setSearch(e.target.value)}/>
                 <button 

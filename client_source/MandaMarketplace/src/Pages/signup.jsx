@@ -38,7 +38,7 @@ export default function Signup() {
         <div className={styles.container}>
             <form className={styles.form} onSubmit={handleSubmit}>
                 <img className={styles.logo} src={logo} alt="Logo" />
-                <span className={styles.span}>MandA Aggie Marketplace</span><br/>
+                <span className={styles.span}>MandA Marketplace</span><br/>
                 <span className={styles.span}>Sign Up</span><br />
                 <input
                     className={styles.input}

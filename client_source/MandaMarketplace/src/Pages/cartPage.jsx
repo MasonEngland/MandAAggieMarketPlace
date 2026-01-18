@@ -5,7 +5,6 @@ import {useNavigate} from "react-router";
 import serverUrl from "../util/serverurl";
 import Cookies from "js-cookie";
 import AuthContext from "../context/authContext";
-import axios from "axios";
 
 
 export default function cartPage() {

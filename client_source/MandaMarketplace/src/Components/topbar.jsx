@@ -4,6 +4,7 @@ import { useState, useEffect, useContext } from 'react';
 import { Link, useNavigate } from 'react-router';
 import Dropdown from './dropdown';
 import AuthContext from '../context/authContext';
+import Cookies from 'js-cookie';
 
 export default function Topbar(props) {
     let selected = props.pageNumber;
@@ -23,6 +24,13 @@ export default function Topbar(props) {
         </nav>
     );
 
+    const logout = () => {
+        user.authenticated = false;
+        Cookies.remove('token');
+        navigate('/');
+        window.location.reload();
+    }
+
 
     // check if user is logged in and change account section accordingly
     useEffect(() => {
@@ -32,7 +40,8 @@ export default function Topbar(props) {
             const ddOptions = [
                 <Link to="/settings" className={styles.a}>Account</Link>,
                 <Link to="/orders" className={styles.a}>View Order Status</Link>,
-                <Link to="/cart" className={styles.a}>Go To Cart</Link>
+                <Link to="/cart" className={styles.a}>Go To Cart</Link>,
+                <span onClick={() => logout()} className={styles.a}>Logout</span>
             ]
             setAccountSection(
                 <nav>
@@ -47,7 +56,8 @@ export default function Topbar(props) {
     const navitems = [
         <Link to="/" className={styles.a + " " + (selected == 0 ? styles.selected : "")} key="1">Home</Link>,
         <Link to="/browse" className={styles.a + " "  + (selected == 1 ? styles.selected: "")} key="2">Browse</Link>,
-        <Link to="/settings" className={styles.a + " " +  (selected == 2 ? styles.selected: "")} key="3">Settings</Link> 
+        <Link to="/settings" className={styles.a + " " +  (selected == 2 ? styles.selected: "")} key="3">Settings</Link>
+         
     ];
 
     return (

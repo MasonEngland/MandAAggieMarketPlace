@@ -1,0 +1,58 @@
+version: '3.9'
+
+services:
+  db:
+    image: mysql:8
+    container_name: server-database
+    restart: always
+    environment:
+      MYSQL_ROOT_PASSWORD: ${DB_ROOT_PASSWORD}
+      MYSQL_DATABASE: MandAMarketplace
+    volumes:
+      - server-data:/var/lib/mysql
+    ports:
+      - "3307:3306"
+    networks:
+      - manda-network
+
+  migrations:
+    image: mcr.microsoft.com/dotnet/sdk:7.0
+    container_name: server-migrations
+    depends_on:
+      - db
+    working_dir: /app
+    volumes:
+      - .:/app
+    environment:
+      ConnectionStrings__Default: ${DB_CONNECTION_STRING}
+    command: >
+      sh -c "
+        dotnet tool install --global dotnet-ef --version 7.* &&
+        export PATH=\"$PATH:/root/.dotnet/tools\" &&
+        dotnet restore &&
+        sleep 30 &&
+        dotnet ef database update
+      "
+    networks:
+      - manda-network
+
+  api:
+    build:
+      context: .
+      dockerfile: Dockerfile
+    container_name: server-api
+    depends_on:
+      - db
+      - migrations
+    ports:
+      - "5001:8080"
+    environment:
+      ConnectionStrings__Default: ${DB_CONNECTION_STRING}
+    networks:
+      - manda-network
+
+volumes:
+  server-data:
+
+networks:
+  manda-network:

@@ -1,0 +1,5 @@
+ACCESS_TOKEN_SECRET=generate a random base64 string for this for maximum security
+STRIPE_API_KEY=stripe api test key
+APPLICATION_URL=use localhost:xxxx where xxxx is the port you are running on
+DB_CONNECTION_STRING=your db connection string, use root as user
+DB_ROOT_PASSWORD=pick any password, make sure it is the same in the connection string

@@ -31,6 +31,7 @@ public class Program
         // Learn more about configuring Swagger/OpenAPI at https://aka.ms/aspnetcore/swashbuckle 
 
         builder.Services.AddEndpointsApiExplorer(); 
+        builder.Services.AddHttpContextAccessor();
 
         var DBConnectionString = builder.Configuration.GetConnectionString("Default")!;
         builder.Services.AddDbContext<DatabaseContext>(options => 

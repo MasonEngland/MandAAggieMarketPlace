@@ -1,0 +1,24 @@
+# Build folders
+bin/
+obj/
+dist/
+
+# Visual Studio and Rider folders
+.vs/
+.idea/
+
+# Node dependencies (if any, we don't need source)
+node_modules/
+
+# Logs, temp files
+*.log
+*.tmp
+
+# Git
+.git/
+.gitignore
+
+# Dockerfile itself is included automatically; no need to ignore unless you want
+
+# Don't ignore .env since you want to copy it
+# .env

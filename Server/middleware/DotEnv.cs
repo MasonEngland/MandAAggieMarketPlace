@@ -4,22 +4,26 @@ public static class DotEnv
 {
 	public static void Config(string path)
 	{
-		if (!File.Exists(path))
-		{
-			throw new Exception(".env could not be found");
-		}
+		if (!File.Exists(path)) throw new Exception(".env could not be found");
 
 		foreach (var line in File.ReadAllLines(path))
 		{
-			var parts = line.Split(
-				'=',
-				StringSplitOptions
-					.RemoveEmptyEntries);
+			var trimmedLine = line.Trim();
 
-			if (parts.Length != 2) { throw new Exception("no environment var found");}
+			// Skip empty lines or comments
+			if (string.IsNullOrWhiteSpace(trimmedLine) || trimmedLine.StartsWith("#"))
+				continue;
 
-			Environment.SetEnvironmentVariable(parts[0], parts[1]);
+			// Split only on the first '='
+			var index = trimmedLine.IndexOf('=');
+			if (index == -1)
+				continue; // Skip invalid lines
 
+			var key = trimmedLine.Substring(0, index).Trim();
+			var value = trimmedLine.Substring(index + 1).Trim();
+
+			Environment.SetEnvironmentVariable(key, value);
 		}
-	}
+    }
+	
 }

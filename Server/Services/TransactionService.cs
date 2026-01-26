@@ -10,16 +10,19 @@ public class TransactionService : ITransactionService
 {
     private readonly DatabaseContext _db;
     private readonly ICommerceService _commerceService;
+    private readonly IHttpContextAccessor _httpContextAccessor;
 
-    public TransactionService(DatabaseContext db, ICommerceService commerceService)
+    public TransactionService(DatabaseContext db, ICommerceService commerceService, IHttpContextAccessor httpContextAccessor)
     {
         _db = db;
         _commerceService = commerceService;
+        _httpContextAccessor = httpContextAccessor;
+
     }
 
     public async Task<string?> CreateCheckoutSession(Item item, string address)
     {
-        string applicationUrl = Environment.GetEnvironmentVariable("APPLICATION_URL")!;
+        string applicationUrl = $"{_httpContextAccessor.HttpContext?.Request.Scheme}://{_httpContextAccessor.HttpContext?.Request.Host}";
         List<SessionLineItemOptions> lineItems = new List<SessionLineItemOptions>();
 
 

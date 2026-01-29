@@ -4,6 +4,8 @@ A full-stack e-commerce web application inspired by Amazon. The application supp
 
 The project is built with a React frontend and an ASP.NET Core backend, using Entity Framework Core and MySQL for data persistence.
 
+Visit the demo at [https://masonengland.online](htts://masonengland.online)
+
 ---
 
 ## Features
@@ -29,6 +31,8 @@ The project is built with a React frontend and an ASP.NET Core backend, using En
 - JWTs
 - Bcrypt
 - MySQL
+- Docker
+- NGINX
 
 ### Payments
 - Stripe API
@@ -38,10 +42,9 @@ The project is built with a React frontend and an ASP.NET Core backend, using En
 ## Installation and Setup
 
 ### Prerequisites
-- Node.js
-- .NET SDK
-- MySQL
 - Stripe account
+- Docker
+- Docker Compose
 
 ---
 
@@ -58,6 +61,12 @@ Description: Stripe secret API key used for payment processing
 Variable Name: APPLICATION_URL  
 Description: URL of the frontend application (Vite development server address)
 
+Variable Name: DB_ROOT_PASSWORD
+Description: A password of your choice for the docker mysql instace
+
+Variable Name: DB_CONNECTION_STRING
+Description: The connection string for the database, "Server=db;Port=3306;Database=MandAMarketplace;User=root;Password=(same as DB_ROOT_PASSWORD);
+
 Example values:
 - APPLICATION_URL=http://localhost:5173
 - APPLICATION_URL=http://localhost:3000
@@ -66,34 +75,16 @@ Example values:
 
 ### Setting Environment Variables
 
-Linux / macOS:
-
-    export ACCESS_TOKEN_SECRET=your_secret_here
-    export STRIPE_API_KEY=your_stripe_key_here
-    export APPLICATION_URL=http://localhost:5173
-
-Windows (PowerShell):
-
-    $env:ACCESS_TOKEN_SECRET="your_secret_here"
-    $env:STRIPE_API_KEY="your_stripe_key_here"
-    $env:APPLICATION_URL="http://localhost:5173"
-
+create a .env file in the /server directory and place all of the environment variables there. They will be read by docker and automatically inserted
 ---
 
 ## Backend Setup
 
-The backend runs like a standard ASP.NET Core application.
+The backend can be easily run with docker:
+    cd server
+    docker compose up -d --build
 
-    cd backend
-    dotnet restore
-    dotnet ef database update
-    dotnet run
-
-If using Entity Framework migrations:
-
-    dotnet ef database update
-
----
+ensure you have docker 
 
 ## Frontend Setup
 
@@ -107,19 +98,17 @@ The frontend will be available at http://localhost:5173 by default.
 
 ## Usage
 
-1. Start the ASP.NET Core backend
-2. Start the React frontend
-3. Open the frontend in a browser
-4. Browse products or use fuzzy search
-5. Add items to the cart and complete checkout
-6. View order history and detailed order information
+1. creat a .env file with the necessary environment variables
+2. run $docker compose up -d --build
+3. visit at https://localhost
+4. to turn off run $docker compose down
 
 
 ---
 
 ## How It Works
 
-The React frontend handles UI rendering and user interaction. The ASP.NET Core API exposes endpoints for products, carts, orders, and checkout. Entity Framework Core manages database access and relationships. MySQL stores product data and order history. Stripe handles secure payment processing so that payments can remain PCI compiant.
+The React frontend handles UI rendering and user interaction. The ASP.NET Core API exposes endpoints for products, carts, orders, and checkout. Entity Framework Core manages database access and relationships. MySQL stores product data and order history. Stripe handles secure payment processing so that payments can remain PCI compiant. Docker for containerization. NGINX for reverse proxy and scalable request handling
 
 ---
 
@@ -128,6 +117,7 @@ The React frontend handles UI rendering and user interaction. The ASP.NET Core A
 - No admin interface for product management
 - Client-side rendered frontend only
 - lack of loading indicators
+- self signed ssl certificate 
 
 ---
 
@@ -138,6 +128,7 @@ The React frontend handles UI rendering and user interaction. The ASP.NET Core A
 - multiple photos of items
 - Performance optimizations
 - Improved mobile responsiveness
+- lets encrpyt signed ssl certificate
 
 ---
 

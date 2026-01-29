@@ -4,7 +4,7 @@ A full-stack e-commerce web application inspired by Amazon. The application supp
 
 The project is built with a React frontend and an ASP.NET Core backend, using Entity Framework Core and MySQL for data persistence.
 
-Visit the demo at [https://masonengland.online](htts://masonengland.online)
+Visit the demo at [https://masonengland.online](https://masonengland.online)
 
 ---
 

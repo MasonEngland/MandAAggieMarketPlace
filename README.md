@@ -35,7 +35,10 @@ Visit the demo at [https://masonengland.online](htts://masonengland.online)
 - NGINX
 
 ### Payments
-- Stripe API
+- [Stripe API](https://stripe.com/)
+
+### dummy data
+- [Fakestore API](https://fakestoreapi.com/)
 
 ---
 
@@ -76,23 +79,23 @@ Example values:
 ### Setting Environment Variables
 
 create a .env file in the /server directory and place all of the environment variables there. They will be read by docker and automatically inserted
+
 ---
 
-## Backend Setup
+## App Setup
 
 The backend can be easily run with docker:
     cd server
     docker compose up -d --build
 
-ensure you have docker 
+ensure you have docker installed and the docker daemon running. 
 
-## Frontend Setup
+If changes are made to the frontend you can build the react code again
+    npm run build
+    docker compose down
+    docker compose up -d --build
 
-    cd frontend
-    npm install
-    npm run dev
-
-The frontend will be available at http://localhost:5173 by default.
+you can also use the vite dev server when making changes to get access to features like hot reload
 
 ---
 

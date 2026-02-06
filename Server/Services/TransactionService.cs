@@ -20,34 +20,47 @@ public class TransactionService : ITransactionService
 
     }
 
-    public async Task<string?> CreateCheckoutSession(Item item, string address)
+    public async Task<string?> CreateCheckoutSession(CartItem[] items, string address)
     {
         string applicationUrl = $"{_httpContextAccessor.HttpContext?.Request.Scheme}://{_httpContextAccessor.HttpContext?.Request.Host}";
         List<SessionLineItemOptions> lineItems = new List<SessionLineItemOptions>();
 
 
-        
-        Item dbItem = await _db.CurrentStock.FirstAsync(h => h.Id == item.Id);
+        Item[] dbItems = new Item[items.Length];
+        string[] itemIds = new string[items.Length];
 
-        if (dbItem.Stock < item.Stock || item.Stock <= 0)
+        var transaction = await _db.Database.BeginTransactionAsync();
+
+        for (int i = 0; i < items.Length; i++)
         {
-            return null;
+            Item? dbItem = await _db.CurrentStock.FirstOrDefaultAsync(h => h.Id == items[i].OrderItem.Id);
+            if (dbItem == null)
+            {
+                return null;
+            }
+            dbItem.Stock = items[i].Amount;
+            dbItems[i] = dbItem;
+            itemIds[i] = dbItem.Id.ToString();
         }
 
-        lineItems.Add(new SessionLineItemOptions
+        foreach (Item item in dbItems)
         {
-            PriceData = new SessionLineItemPriceDataOptions
+            lineItems.Add(new SessionLineItemOptions
             {
-                UnitAmount = (long)(item.Price * 100),
-                Currency = "usd",
-                ProductData = new SessionLineItemPriceDataProductDataOptions
+                PriceData = new SessionLineItemPriceDataOptions
                 {
-                    Name = item.Name,
-                    Description = item.Description,
+                    UnitAmount = (long)(item.Price * 100),
+                    Currency = "usd",
+                    ProductData = new SessionLineItemPriceDataProductDataOptions
+                    {
+                        Name = item.Name,
+                        Description = item.Description,
+                    },
                 },
-            },
-            Quantity = item.Stock,
-        });
+                Quantity = item.Stock,
+            });
+        }
+        
         
         // create the stripe checkout session
         var sessionoptions = new SessionCreateOptions
@@ -58,12 +71,14 @@ public class TransactionService : ITransactionService
             ReturnUrl = $"{applicationUrl}/status?session_id={{CHECKOUT_SESSION_ID}}&address={address}",
             Metadata = new Dictionary<string, string>
             {
-                { "itemId", item.Id.ToString() },
+                { "itemIds", string.Join(",", itemIds) },
             },
 
         };
         var sessionService = new SessionService();
         Session session = sessionService.Create(sessionoptions);
+
+        await transaction.RollbackAsync();
         return session.Id;
     }
 
@@ -79,7 +94,6 @@ public class TransactionService : ITransactionService
                 Expand = new List<string> { "line_items" },
             };
             Session session = sessionService.Get(sessionId, options);
-            Console.WriteLine("Retrieved session: " + session.Id);
             Models.Account account = _db.accounts.First(a => a.Id.ToString() == accountId);
 
             if (session.PaymentStatus != "paid")
@@ -87,30 +101,49 @@ public class TransactionService : ITransactionService
                 return false;
             }
 
-            string? itemId = session.Metadata.TryGetValue("itemId", out var value) ? value : null;
+            string[] itemIds = session.Metadata["itemIds"].Split(',');
+            if (itemIds.Length <= 0 || itemIds == null) return false;
 
 
-            if (itemId == null) return false;
             
 
 
-            Item dbItem = await _db.CurrentStock.FirstAsync(h => h.Id.ToString() == itemId);
-
-            long? quantity = session.LineItems.Data[0].Quantity;
-            if (quantity == null) return false;
-            Item purchaseItem = new Item
+            Item[] dbItems = new Item[itemIds.Length];
+            for (int i = 0; i < itemIds.Length; i++)
             {
-                Id = dbItem.Id,
-                Name = dbItem.Name,
-                Description = dbItem.Description,
-                Price = dbItem.Price,
-                Stock = (int)quantity,
-                Date = dbItem.Date,
-                ImageLink = dbItem.ImageLink,
-                Category = dbItem.Category,
-            };
+                Item? dbItem = await _db.CurrentStock.FirstOrDefaultAsync(h => h.Id.ToString() == itemIds[i]);
+                if (dbItem == null)
+                {
+                    return false;
+                }
+                dbItems[i] = dbItem;
+            }
 
-            return await ProcessPurchase(account, purchaseItem, address, session, sessionId);
+            foreach (Item dbItem in dbItems)
+            {
+                long? quantity = session.LineItems.Data[0].Quantity;
+                if (quantity == null) return false;
+                Item purchaseItem = new Item
+                {
+                    Id = dbItem.Id,
+                    Name = dbItem.Name,
+                    Description = dbItem.Description,
+                    Price = dbItem.Price,
+                    Stock = (int)quantity,
+                    Date = dbItem.Date,
+                    ImageLink = dbItem.ImageLink,
+                    Category = dbItem.Category,
+                };
+                bool purchaseResult = await ProcessPurchase(account, purchaseItem, address, session, sessionId);
+                if (!purchaseResult)
+                {
+                    return false;
+                }
+
+            }
+
+            
+            return true;
         } catch (Exception ex)
         {
             Console.WriteLine("Error in HandleCheckoutStatus: " + ex.Message);

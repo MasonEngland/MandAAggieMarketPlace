@@ -74,11 +74,13 @@ export default function Item(props) {
 
         item.stock = quantity;
 
+        const body = [{Amount: quantity, Address: address, OwnerId: user.id, OrderItemId: item.id, OrderItem: item},];
 
         // make request to database
-        axios.post(`${serverUrl}/Api/Transactions/Checkout/${address}`, item, {
+        axios.post(`${serverUrl}/Api/Transactions/Checkout/${address}`, JSON.stringify(body), {
             headers: {
-                'Authorization': `Bearer ${token}`
+                'Authorization': `Bearer ${token}`,
+                'Content-Type': 'application/json'
             }
         })
         .then(res => {

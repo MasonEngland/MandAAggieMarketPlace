@@ -2,15 +2,19 @@ using Server.Services;
 using Server.Models;
 using Microsoft.AspNetCore.Mvc;
 using Server.Util;
+using Server.Context;
 
 [ApiController]
 [Route("/Api/Cart")]
 public class CartController : Controller
 {
     private readonly IShoppingCartService _cartService;
-    public CartController(IShoppingCartService cartService)
+    private readonly DatabaseContext _db;
+    public CartController(IShoppingCartService cartService, DatabaseContext db)
     {
         _cartService = cartService;
+        _db = db;
+
     }
 
     [HttpPost("AddToCart/{address}")]
@@ -37,22 +41,54 @@ public class CartController : Controller
         Account? user = AccountUtilities.GetAccount(HttpContext);
         if (user == null) return BadRequest(new { message = "user could not be found", success = false });
 
-        Item[] cartItems = await _cartService.GetCartItems(user.Id.ToString());
-        return Ok(new { success = true, cartItems });
+        try
+        {
+            var transaction = await _db.Database.BeginTransactionAsync();
+            CartItem[] cartItems = await _cartService.GetCartItems(user.Id.ToString());
+            Item[] items = _db.CurrentStock
+                .Where(i => cartItems.Select(ci => ci.OrderItemId).Contains(i.Id))
+                .ToArray();
+
+            for (int i = 0; i < cartItems.Length; i++)
+            {
+                items[i].Stock = cartItems[i].Amount;
+            }
+
+            await transaction.RollbackAsync();
+            return Ok(new { success = true, cartItems, items });
+
+            
+        } catch (Exception ex)
+        {
+            Console.WriteLine("Error in GetCartItems: " + ex.Message);
+            Console.WriteLine(ex.StackTrace);
+            return StatusCode(500, new { message = "internal server error", success = false });
+        }
+
+        
     }
 
     [HttpGet("PurchaseCartItems")]
     public async Task<IActionResult> PurchaseCartItems()
     {
-        Account? user = AccountUtilities.GetAccount(HttpContext);
+        try
+        {
+            Account? user = AccountUtilities.GetAccount(HttpContext);
 
-        if (user == null) return BadRequest(new { message = "could not find user", success = false });
+            if (user == null) return BadRequest(new { message = "could not find user", success = false });
 
-        bool success = await _cartService.PurchaseCartItems(user.Id.ToString());
+            bool success = await _cartService.PurchaseCartItems(user.Id.ToString());
 
-        if (success) return Ok(new { success = true });
+            if (success) return Ok(new { success = true });
 
-        return BadRequest(new { message = "Could not purchase all cart items", success = false });
+            return BadRequest(new { message = "Could not purchase all cart items", success = false });
+        } catch (Exception ex)
+        {
+            Console.WriteLine("Error in PurchaseCartItems: " + ex.Message);
+            Console.WriteLine(ex.StackTrace);
+            return StatusCode(500, new { message = "internal server error", success = false });
+        }
+        
     }
 
     [HttpDelete("RemoveFromCart/{itemId}")]

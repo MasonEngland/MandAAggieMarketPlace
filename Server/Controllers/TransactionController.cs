@@ -1,6 +1,8 @@
 using Microsoft.AspNetCore.Mvc;
 using Server.Models;
 using Server.Util;
+using Server.Context;
+using Microsoft.EntityFrameworkCore;
 
 namespace Server.Controllers;
 
@@ -9,15 +11,18 @@ namespace Server.Controllers;
 public class TransactionController : Controller
 {
     private readonly ITransactionService _transactionService;
+    private readonly DatabaseContext _db;
 
-    public TransactionController(ITransactionService transactionService)
+    public TransactionController(ITransactionService transactionService, DatabaseContext db)
     {
         _transactionService = transactionService;
+        _db = db;
+
         
     }
 
     [HttpPost("Checkout/{address}")]
-    public async Task<IActionResult> CreateCheckoutSession([FromBody] Item item, string address)
+    public async Task<IActionResult> CreateCheckoutSession([FromBody] CartItem[] items, string address)
     {
         Account? account = AccountUtilities.GetAccount(HttpContext);
         if (account == null)
@@ -25,14 +30,16 @@ public class TransactionController : Controller
             return Unauthorized(new {success = false, message = "could not authenticate"});
         }
 
-        string? sessionId = await _transactionService.CreateCheckoutSession(item, address);
+        string? sessionId = await _transactionService.CreateCheckoutSession(items, address);
 
         if (sessionId == null)
         {
             return StatusCode(500, new {success = false, message = "could not create checkout session"});
         }
 
-        return Ok(new {success = true, sessionId, item});
+        
+
+        return Ok(new {success = true, sessionId, items});
     }
 
     [HttpPost("CheckoutStatus")]
@@ -50,6 +57,15 @@ public class TransactionController : Controller
         {
             return StatusCode(400, new { success = false, message = "checkout status was not successful" });
         }
+        
+        CartItem[] cartItems = await _db.CartItems.Where(c => c.OwnerId == account.Id.ToString()).ToArrayAsync();
+         
+        // remove cart itmes from user cart 
+        foreach (CartItem item in cartItems)
+        {
+            _db.CartItems.Remove(item);
+        }
+        await _db.SaveChangesAsync();
         return Ok(new { success = true });
     }
 

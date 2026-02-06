@@ -9,7 +9,7 @@ public interface IShoppingCartService
     public Task<bool> AddToCart(Item item, string userId, string address);
 
     // returns all the items belonging to a given user
-    public Task<Item[]> GetCartItems(string userId);
+    public Task<CartItem[]> GetCartItems(string userId);
 
     // returns true if purchase was successful for all items
     // returns false if any items failed

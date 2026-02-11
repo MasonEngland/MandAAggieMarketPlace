@@ -17,6 +17,18 @@ public class ShoppingCartService : IShoppingCartService
         * only returns true if the item request is succefully added to the users shopping cart 
         */
 
+        // check if item is already in cart, if so update the amount instead of adding a new cart item
+        CartItem? existingCartItem = await _db.CartItems
+            .FirstOrDefaultAsync(ci => ci.OwnerId == userId && ci.OrderItemId == item.Id);
+        
+        if (existingCartItem != null)
+        {
+            existingCartItem.Amount += item.Stock;
+            try { await _db.SaveChangesAsync(); }
+            catch (Exception err) { Console.WriteLine(err.Message); return false; }
+            return true;
+        }
+
         Account? userAccount = await _db.accounts.FirstOrDefaultAsync(a => a.Id.ToString() == userId);
         if (userAccount == null)
         {

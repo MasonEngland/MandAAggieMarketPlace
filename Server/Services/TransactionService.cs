@@ -168,7 +168,7 @@ public class TransactionService : ITransactionService
             
             (bool success, Item? item) result = await _commerceService.Purchase(account, item, address);
 
-            if (!result.success) return false;
+            if (!result.success) throw new Exception($"Purchase failed for item {item.Name}");
 
             await transaction.CommitAsync();
             return true;

@@ -1,2 +1,2 @@
-const serverUrl = "http://localhost:2501";
+const serverUrl = "";
 export default serverUrl;

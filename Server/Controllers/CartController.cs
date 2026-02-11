@@ -49,10 +49,12 @@ public class CartController : Controller
                 .Where(i => cartItems.Select(ci => ci.OrderItemId).Contains(i.Id))
                 .ToArray();
 
-            for (int i = 0; i < cartItems.Length; i++)
+            for (int i = 0; i < items.Length; i++)
             {
-                items[i].Stock = cartItems[i].Amount;
+                items[i].Stock = cartItems.First(ci => ci.OrderItemId == items[i].Id).Amount;
             }
+
+            
 
             await transaction.RollbackAsync();
             return Ok(new { success = true, cartItems, items });

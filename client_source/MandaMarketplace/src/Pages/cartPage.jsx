@@ -6,7 +6,6 @@ import serverUrl from "../util/serverurl";
 import Cookies from "js-cookie";
 import AuthContext from "../context/authContext";
 import styles from "../css/item.module.css";
-import cookies from "js-cookie";
 import axios from "axios";
 
 
@@ -92,7 +91,7 @@ export default function cartPage() {
         .then(res => {
             console.log(res);
             if (res.data.success === true) {
-                location.href = '/checkout?session_id=' + res.data.sessionId + '&address=' + address;
+                navigate('/checkout?session_id=' + res.data.sessionId + '&address=' + address);
             }
             else {
                 alert(res.data.message);

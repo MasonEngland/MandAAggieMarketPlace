@@ -70,29 +70,6 @@ public class CartController : Controller
         
     }
 
-    [HttpGet("PurchaseCartItems")]
-    public async Task<IActionResult> PurchaseCartItems()
-    {
-        try
-        {
-            Account? user = AccountUtilities.GetAccount(HttpContext);
-
-            if (user == null) return BadRequest(new { message = "could not find user", success = false });
-
-            bool success = await _cartService.PurchaseCartItems(user.Id.ToString());
-
-            if (success) return Ok(new { success = true });
-
-            return BadRequest(new { message = "Could not purchase all cart items", success = false });
-        } catch (Exception ex)
-        {
-            Console.WriteLine("Error in PurchaseCartItems: " + ex.Message);
-            Console.WriteLine(ex.StackTrace);
-            return StatusCode(500, new { message = "internal server error", success = false });
-        }
-        
-    }
-
     [HttpDelete("RemoveFromCart/{itemId}")]
     public async Task<IActionResult> RemoveFromCart(string itemId)
     {

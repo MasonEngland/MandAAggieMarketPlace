@@ -11,9 +11,5 @@ public interface IShoppingCartService
     // returns all the items belonging to a given user
     public Task<CartItem[]> GetCartItems(string userId);
 
-    // returns true if purchase was successful for all items
-    // returns false if any items failed
-    public Task<bool> PurchaseCartItems(string userId);
-
     public Task<bool> RemoveFromCart(string itemId, string userId);
 }

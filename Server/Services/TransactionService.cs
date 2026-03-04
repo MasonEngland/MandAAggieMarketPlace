@@ -10,141 +10,60 @@ public class TransactionService : ITransactionService
 {
     private readonly DatabaseContext _db;
     private readonly ICommerceService _commerceService;
-    private readonly IHttpContextAccessor _httpContextAccessor;
+    private readonly IStripeService _stripeService;
 
-    public TransactionService(DatabaseContext db, ICommerceService commerceService, IHttpContextAccessor httpContextAccessor)
+    public TransactionService(DatabaseContext db, ICommerceService commerceService, IStripeService stripeService)
     {
         _db = db;
         _commerceService = commerceService;
-        _httpContextAccessor = httpContextAccessor;
-
+        _stripeService = stripeService;
     }
 
-    public async Task<string?> CreateCheckoutSession(CartItem[] items, string address)
+    public async Task<string?> CreateCheckoutSession(CartItem[] items, string address, string applicationUrl)
     {
-        string applicationUrl = $"{_httpContextAccessor.HttpContext?.Request.Scheme}://{_httpContextAccessor.HttpContext?.Request.Host}";
-        List<SessionLineItemOptions> lineItems = new List<SessionLineItemOptions>();
-
-
-        Item[] dbItems = new Item[items.Length];
-        string[] itemIds = new string[items.Length];
-
-        var transaction = await _db.Database.BeginTransactionAsync();
-
-        for (int i = 0; i < items.Length; i++)
-        {
-            Item? dbItem = await _db.CurrentStock.FirstOrDefaultAsync(h => h.Id == items[i].OrderItem.Id);
-            if (dbItem == null)
-            {
-                return null;
-            }
-            dbItem.Stock = items[i].Amount;
-            dbItems[i] = dbItem;
-            itemIds[i] = dbItem.Id.ToString();
-        }
-
-        foreach (Item item in dbItems)
-        {
-            lineItems.Add(new SessionLineItemOptions
-            {
-                PriceData = new SessionLineItemPriceDataOptions
-                {
-                    UnitAmount = (long)(item.Price * 100),
-                    Currency = "usd",
-                    ProductData = new SessionLineItemPriceDataProductDataOptions
-                    {
-                        Name = item.Name,
-                        Description = item.Description,
-                    },
-                },
-                Quantity = item.Stock,
-            });
-        }
-        
-        
-        // create the stripe checkout session
-        var sessionoptions = new SessionCreateOptions
-        {
-            LineItems = lineItems,
-            Mode = "payment",
-            UiMode = "embedded",
-            ReturnUrl = $"{applicationUrl}/status?session_id={{CHECKOUT_SESSION_ID}}&address={address}",
-            Metadata = new Dictionary<string, string>
-            {
-                { "itemIds", string.Join(",", itemIds) },
-            },
-
-        };
-        var sessionService = new SessionService();
-        Session session = sessionService.Create(sessionoptions);
-
-        await transaction.RollbackAsync();
-        return session.Id;
+        // pass through for interface reasons. 
+        // this was to move stripe logic to another service for readability
+        return await _stripeService.CreateCheckoutSession(items, address, applicationUrl);
     }
+
+
+
 
     public async Task<bool> HandleCheckoutStatus(string sessionId, string accountId, string address)
     {
         try
         {
-            
-        
-            SessionService sessionService = new SessionService();
-            var options = new SessionGetOptions
-            {
-                Expand = new List<string> { "line_items" },
-            };
-            Session session = sessionService.Get(sessionId, options);
-            Models.Account account = _db.accounts.First(a => a.Id.ToString() == accountId);
+            Session session = _stripeService.GetSession(sessionId);
+            Models.Account account = GetAccount(accountId);
 
-            if (session.PaymentStatus != "paid")
+            if (!IsPaymentSuccessful(session))
             {
                 return false;
             }
 
-            string[] itemIds = session.Metadata["itemIds"].Split(',');
-            if (itemIds.Length <= 0 || itemIds == null) return false;
-
-
-            
-
-
-            Item[] dbItems = new Item[itemIds.Length];
-            for (int i = 0; i < itemIds.Length; i++)
+            string[] itemIds = GetItemIds(session);
+            if (itemIds == null || itemIds.Length <= 0)
             {
-                Item? dbItem = await _db.CurrentStock.FirstOrDefaultAsync(h => h.Id.ToString() == itemIds[i]);
-                if (dbItem == null)
-                {
-                    return false;
-                }
-                dbItems[i] = dbItem;
+                return false;
+            }
+
+            Item[] dbItems = await GetDatabaseItems(itemIds);
+            if (dbItems.Length <= 0)
+            {
+                return false;
             }
 
             foreach (Item dbItem in dbItems)
             {
-                long? quantity = session.LineItems.Data[0].Quantity;
-                if (quantity == null) return false;
-                Item purchaseItem = new Item
-                {
-                    Id = dbItem.Id,
-                    Name = dbItem.Name,
-                    Description = dbItem.Description,
-                    Price = dbItem.Price,
-                    Stock = (int)quantity,
-                    Date = dbItem.Date,
-                    ImageLink = dbItem.ImageLink,
-                    Category = dbItem.Category,
-                };
-                bool purchaseResult = await ProcessPurchase(account, purchaseItem, address, session, sessionId);
-                if (!purchaseResult)
+                if (!await ProcessItemPurchase(dbItem, account, address, session, sessionId))
                 {
                     return false;
                 }
-
             }
 
-            
             return true;
-        } catch (Exception ex)
+        }
+        catch (Exception ex)
         {
             Console.WriteLine("Error in HandleCheckoutStatus: " + ex.Message);
             Console.WriteLine(ex.StackTrace);
@@ -154,9 +73,7 @@ public class TransactionService : ITransactionService
 
     public async Task<string?> GetSecret(string sessionId)
     {
-        var sessionService = new SessionService();
-        Session session = sessionService.Get(sessionId);
-        return session.ClientSecret;
+        return await _stripeService.GetSecret(sessionId);
     }
 
     private async Task<bool> ProcessPurchase(Models.Account account, Item item, string address, Session session, string sessionId) 
@@ -164,9 +81,9 @@ public class TransactionService : ITransactionService
         using var transaction = await _db.Database.BeginTransactionAsync();
         try
         {
+            Item[] dbItem = await _db.CurrentStock.Where(i => i.Id == item.Id).ToArrayAsync();
             
-            
-            (bool success, Item? item) result = await _commerceService.Purchase(account, item, address);
+            (bool success, Item? dbItem) result = await _commerceService.Purchase(account, item, address);
 
             if (!result.success) throw new Exception($"Purchase failed for item {item.Name}");
 
@@ -202,5 +119,64 @@ public class TransactionService : ITransactionService
             
             return false;
         }
+    }
+
+    private Models.Account GetAccount(string accountId)
+    {
+        return _db.accounts.First(a => a.Id.ToString() == accountId);
+    }
+
+    private bool IsPaymentSuccessful(Session session)
+    {
+        return session.PaymentStatus == "paid";
+    }
+
+    private string[] GetItemIds(Session session)
+    {
+        return session.Metadata["itemIds"].Split(',');
+    }
+
+    private async Task<Item[]> GetDatabaseItems(string[] itemIds)
+    {
+        try
+        {
+            Item[] dbItems = await _db.CurrentStock.Where(i => itemIds.Contains(i.Id.ToString())).ToArrayAsync();
+            return dbItems;
+
+
+        } catch (Exception err)
+        {
+            Console.WriteLine("Error fetching database items: " + err.Message);
+            Console.WriteLine(err.StackTrace);
+            return new Item[0];
+        }
+    }
+
+
+
+    private async Task<bool> ProcessItemPurchase(Item dbItem, Models.Account account, string address, Session session, string sessionId)
+    {
+        // fetch line item for this db item
+        LineItem? lineItem = session.LineItems.Data.First(li => li.Metadata["itemId"] == dbItem.Id.ToString());
+        long? quantity = lineItem.Quantity;
+
+        if (quantity == null || quantity <= 0)
+        {
+            return false;
+        }
+        
+        Item purchaseItem = new Item
+        {
+            Id = dbItem.Id,
+            Name = dbItem.Name,
+            Description = dbItem.Description,
+            Price = dbItem.Price,
+            Stock = (int)quantity,
+            Date = dbItem.Date,
+            ImageLink = dbItem.ImageLink,
+            Category = dbItem.Category,
+        };
+
+        return await ProcessPurchase(account, purchaseItem, address, session, sessionId);
     }
 }

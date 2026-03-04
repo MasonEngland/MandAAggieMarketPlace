@@ -1,11 +1,11 @@
 using Server.Models;
+using Stripe.Checkout;
 
-public interface ITransactionService
+public interface IStripeService
 {
     Task<string?> CreateCheckoutSession(CartItem[] items, string address, string applicationUrl);
-
-    Task<bool> HandleCheckoutStatus(string sessionId, string accountId, string address);
-
     Task<string?> GetSecret(string sessionId);
+
+    Session GetSession(string sessionId);
 
 }

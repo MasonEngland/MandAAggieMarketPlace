@@ -35,7 +35,7 @@ public class ShoppingCartService : IShoppingCartService
             return false;
         }
 
-        Item? dbItem = await _db.CurrentStock.FirstOrDefaultAsync(i => i.Id == item.Id); // this is to keep entity trakcing in tact 
+        Item? dbItem = await _db.CurrentStock.FirstOrDefaultAsync(i => i.Id == item.Id); // this is to keep entity tracking in tact 
         if (dbItem == null)
         {
             return false;
@@ -79,68 +79,7 @@ public class ShoppingCartService : IShoppingCartService
         
     }
 
-    public async Task<bool> PurchaseCartItems(string userId)
-    {
-        /**
-        * Method to purchase ALL items in a users shopping cart
-        * will ONLY return true if all the items are purchased succesfully
-        * users will have the opportunity to purchase items from their cart individually as well 
-        */
-
-        try
-        {
-            CartItem[] dbItems = await _db.CartItems.Where(p => p.OwnerId == userId).ToArrayAsync();
-            Account? user = await _db.accounts.Where(p => p.Id.ToString() == userId).FirstOrDefaultAsync();
-
-            if (user == null) return false;
-
-
-            if (dbItems.Length < 1)
-            {
-                return false;
-            }
-
-            Item[] orderedItems = new Item[dbItems.Length];
-
-            for (int i = 0; i < dbItems.Length; i++)
-            {
-                var orderedItem = await _db.CurrentStock.Where(p => p.Id == dbItems[i].OrderItemId).FirstOrDefaultAsync();
-
-                if (orderedItem == null) return false;
-
-                if (orderedItem.Stock < dbItems[i].Amount) return false;
-                orderedItem.Stock -= dbItems[i].Amount;
-
-
-                var newOrder = new Order()
-                {
-                    OwnerId = userId,
-                    OrderItem = orderedItem,
-                    Address = dbItems[i].Address,
-                    Amount = dbItems[i].Amount
-                };
-
-                _db.OrderQueue.Add(newOrder);
-                orderedItems[i] = orderedItem;
-                _db.CartItems.Remove(dbItems[i]);
-            }
-
-
-            await _db.SaveChangesAsync();
-
-
-            return true;
-        }
-        catch (Exception err)
-        {
-            Console.WriteLine(err.Message);
-            Console.WriteLine(err.StackTrace);
-            return false;
-        }
-
-
-        
-    }
+    
     
     public async Task<bool> RemoveFromCart(string itemId, string userId)
     {

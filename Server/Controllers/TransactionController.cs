@@ -17,8 +17,6 @@ public class TransactionController : Controller
     {
         _transactionService = transactionService;
         _db = db;
-
-        
     }
 
     [HttpPost("Checkout/{address}")]
@@ -30,7 +28,9 @@ public class TransactionController : Controller
             return Unauthorized(new {success = false, message = "could not authenticate"});
         }
 
-        string? sessionId = await _transactionService.CreateCheckoutSession(items, address);
+        string applicationUrl = $"{Request.Scheme}://{Request.Host}";
+
+        string? sessionId = await _transactionService.CreateCheckoutSession(items, address, applicationUrl);
 
         if (sessionId == null)
         {
